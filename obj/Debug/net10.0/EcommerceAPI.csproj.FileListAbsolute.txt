@@ -168,3 +168,4 @@ D:\EcommerceAPI\EcommerceAPI\bin\Debug\net10.0\publish\EcommerceAPI.deps.json
 D:\EcommerceAPI\EcommerceAPI\bin\Debug\net10.0\publish\EcommerceAPI.runtimeconfig.json
 D:\EcommerceAPI\EcommerceAPI\bin\Debug\net10.0\publish\EcommerceAPI.staticwebassets.endpoints.json
 D:\EcommerceAPI\EcommerceAPI\bin\Debug\net10.0\dotnet-tools.json
+D:\EcommerceAPI\EcommerceAPI\obj\Debug\net10.0\EcommerceAPI.sourcelink.json

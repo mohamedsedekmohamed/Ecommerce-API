@@ -48,11 +48,16 @@ namespace EcommerceAPI.Services
         }
 
         // 2. تسجيل الدخول
-        public async Task<AuthModel> LoginAsync(LoginDto model)
+    public async Task<AuthModel> LoginAsync(LoginDto model, string requiredRole) 
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                 return new AuthModel { Message = "الإيميل أو كلمة المرور غير صحيحة!" };
+
+            // 👇 التعديل الثاني الهام: التحقق من أن هذا المستخدم يمتلك الصلاحية المطلوبة للدخول من هذا المسار
+            var hasRole = await _userManager.IsInRoleAsync(user, requiredRole);
+            if (!hasRole)
+                return new AuthModel { Message = $"غير مصرح لك بالدخول كـ {requiredRole}!" };
 
             var authClaims = new List<Claim>
             {
@@ -61,7 +66,7 @@ namespace EcommerceAPI.Services
                 new Claim(ClaimTypes.Email, user.Email!)
             };
 
-            // 👇 التعديل الهام: جلب صلاحيات المستخدم وإضافتها للـ Token لكي يعمل الـ Role-Based Authorization
+            // جلب صلاحيات المستخدم وإضافتها للـ Token 
             var userRoles = await _userManager.GetRolesAsync(user);
             foreach (var role in userRoles)
             {
@@ -83,7 +88,7 @@ namespace EcommerceAPI.Services
                 Message = "تم تسجيل الدخول بنجاح!",
                 IsAuthenticated = true,
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
-                ExpiresOn = token.ValidTo
+                ExpiresOn = token.ValidTo,
             };
         }
 
@@ -161,6 +166,9 @@ namespace EcommerceAPI.Services
             });
         }
 
+
+
+
         // أضف هذا الكود داخل AuthService.cs
         public async Task<bool> UpdateAdminBySuperAdminAsync(string adminId, UpdateAdminDto model)
         {
@@ -190,5 +198,8 @@ namespace EcommerceAPI.Services
 
             return true;
         }
+
+
+        
     }
 }
