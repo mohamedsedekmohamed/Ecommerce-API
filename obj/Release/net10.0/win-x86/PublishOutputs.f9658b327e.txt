@@ -15,7 +15,6 @@ D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Azure.Core.d
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Azure.Identity.dll
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
-D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Microsoft.AspNetCore.OpenApi.dll
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Microsoft.Bcl.Cryptography.dll
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\PubTmp\Out\Microsoft.Data.SqlClient.dll

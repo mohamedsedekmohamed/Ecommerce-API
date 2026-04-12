@@ -3,24 +3,24 @@
   "WorkspaceRootPath": "D:\\EcommerceAPI\\EcommerceAPI\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\EcommerceAPI\\EcommerceAPI\\obj\\Debug\\net10.0\\sv3duoqn.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:obj\\Debug\\net10.0\\sv3duoqn.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+      "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\ecommerceapi.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
       "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:ecommerceapi.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\publish\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:publish\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\EcommerceAPI\\EcommerceAPI\\obj\\Debug\\net10.0\\sv3duoqn.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:obj\\Debug\\net10.0\\sv3duoqn.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\EcommerceAPI\\EcommerceAPI\\obj\\Debug\\net10.0\\sv3duoqn.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:obj\\Debug\\net10.0\\sv3duoqn.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+      "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\publish\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:publish\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,14 +42,27 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "sv3duoqn.sql ",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "appsettings.json",
+              "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\appsettings.json",
+              "RelativeToolTip": "appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-11T10:43:37.042Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "sv3duoqn.sql",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\obj\\Debug\\net10.0\\sv3duoqn.sql",
               "RelativeDocumentMoniker": "obj\\Debug\\net10.0\\sv3duoqn.sql",
-              "ToolTip": "sv3duoqn.sql ",
+              "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\obj\\Debug\\net10.0\\sv3duoqn.sql",
+              "RelativeToolTip": "obj\\Debug\\net10.0\\sv3duoqn.sql",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
-              "WhenOpened": "2026-04-06T15:46:21.753Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-06T15:46:21.753Z"
             },
             {
               "$type": "Document",
@@ -61,25 +74,24 @@
               "RelativeToolTip": "EcommerceAPI.http",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
-              "WhenOpened": "2026-04-06T15:11:21.216Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-06T15:11:21.216Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAGcAAAAAAAAAAAAwwHwAAABAAAAAAAAAAA==",
+              "ViewState": "AgIAAFsAAAAAAAAAAAAQwGQAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-04-06T15:11:18.83Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "web.config",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\publish\\web.config",
               "RelativeDocumentMoniker": "publish\\web.config",
@@ -87,8 +99,7 @@
               "RelativeToolTip": "publish\\web.config",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2026-04-06T15:09:30.887Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-06T15:09:30.887Z"
             }
           ]
         }

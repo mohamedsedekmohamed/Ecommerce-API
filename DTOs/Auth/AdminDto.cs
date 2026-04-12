@@ -1,0 +1,10 @@
+namespace EcommerceAPI.DTOs.Auth
+{
+    public class AdminDto
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public IList<string> Roles { get; set; } = new List<string>();
+    }
+}

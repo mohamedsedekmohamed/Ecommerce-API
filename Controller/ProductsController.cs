@@ -1,5 +1,5 @@
 using EcommerceAPI.DTOs.Products;
-using EcommerceAPI.DTOs.Categories; // 👈 أضفنا هذا الـ Namespace
+using EcommerceAPI.DTOs.Categories;
 using EcommerceAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -13,83 +13,193 @@ namespace EcommerceAPI.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly ICategoryService _categoryService; // 👈 1. حقن خدمة التصنيفات هنا
+        private readonly ICategoryService _categoryService;
 
         public ProductsController(IProductService productService, ICategoryService categoryService)
         {
             _productService = productService;
-            _categoryService = categoryService; // 👈 2. تعيين الخدمة
+            _categoryService = categoryService;
         }
 
-        private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
-        private bool IsSuperAdmin() => User.IsInRole(AppRoles.SuperAdmin);
+        private string GetUserId() =>
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
-       [HttpGet]
-        [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
-        public async Task<IActionResult> GetAll()
+        private bool IsSuperAdmin() =>
+            User.IsInRole(AppRoles.SuperAdmin);
+
+        private string GetLang() =>
+            Request.Headers["Accept-Language"].ToString();
+
+        [HttpGet("user/all")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductsForUser()
         {
-            // 1. جلب المنتجات (بالصلاحيات والفلترة)
-            var products = await _productService.GetAllProductsAsync(GetUserId(), IsSuperAdmin());
-            
-            // 2. جلب التصنيفات الخفيفة للقائمة المنسدلة
+            var lang = GetLang();
+
+            var products = await _productService.GetAllProductsAsync(string.Empty, true);
+
+            return Ok(ApiResponse.Success(
+                "تم جلب المنتجات بنجاح",
+                "Products fetched successfully",
+                lang,
+                products));
+        }
+
+        // ==========================================
+        // Admin
+        // ==========================================
+        [HttpGet("admin/all")]
+        [Authorize(Roles = AppRoles.Admin)]
+        public async Task<IActionResult> GetProductsForAdmin()
+        {
+            var lang = GetLang();
+
+            var products = await _productService.GetAllProductsAsync(GetUserId(), false);
             var categories = await _categoryService.GetCategoriesForSelectAsync();
 
-            // 3. دمجهم معاً في الـ DTO الجديد
-            var dashboardData = new ProductsDashboardDto
+            var data = new ProductsDashboardDto
             {
                 Products = products,
                 Categories = categories
             };
 
-            return Ok(dashboardData);
+            return Ok(ApiResponse.Success(
+                "تم جلب بيانات المنتجات",
+                "Products dashboard fetched",
+                lang,
+                data));
         }
 
-       
+        // ==========================================
+        // SuperAdmin
+        // ==========================================
+        [HttpGet("superadmin/all")]
+        [Authorize(Roles = AppRoles.SuperAdmin)]
+        public async Task<IActionResult> GetProductsForSuperAdmin()
+        {
+            var lang = GetLang();
 
+            var products = await _productService.GetAllProductsAsync(GetUserId(), true);
+            var categories = await _categoryService.GetCategoriesForSelectAsync();
+
+            var data = new ProductsDashboardDto
+            {
+                Products = products,
+                Categories = categories
+            };
+
+            return Ok(ApiResponse.Success(
+                "تم جلب كل المنتجات",
+                "All products fetched",
+                lang,
+                data));
+        }
+
+        // ==========================================
+        // Get By Id
+        // ==========================================
         [HttpGet("{id}")]
-        [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
+            var lang = GetLang();
+
             var product = await _productService.GetProductByIdAsync(id, GetUserId(), IsSuperAdmin());
-            if (product == null) return NotFound($"المنتج غير موجود أو ليس لديك صلاحية لرؤيته.");
-            return Ok(product);
+
+            if (product == null)
+                return NotFound(ApiResponse.Error(
+                    "المنتج غير موجود أو ليس لديك صلاحية",
+                    "Product not found or access denied",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم جلب المنتج بنجاح",
+                "Product fetched successfully",
+                lang,
+                product));
         }
 
+        // ==========================================
+        // Create
+        // ==========================================
         [HttpPost]
         [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
         public async Task<IActionResult> Create([FromBody] CreateProductDto dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var lang = GetLang();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse.Error(
+                    "بيانات غير صحيحة",
+                    "Invalid data",
+                    lang));
+
             var product = await _productService.CreateProductAsync(dto, GetUserId());
-            if (product == null) return BadRequest("التصنيف المحدد غير موجود.");
-            return Ok(product);
+
+            if (product == null)
+                return BadRequest(ApiResponse.Error(
+                    "التصنيف غير موجود",
+                    "Category not found",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم إنشاء المنتج بنجاح",
+                "Product created successfully",
+                lang,
+                product));
         }
 
+        // ==========================================
+        // Update
+        // ==========================================
         [HttpPut("{id}")]
         [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
         public async Task<IActionResult> Update(int id, [FromBody] CreateProductDto dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var lang = GetLang();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse.Error(
+                    "بيانات غير صحيحة",
+                    "Invalid data",
+                    lang));
+
             var product = await _productService.UpdateProductAsync(id, dto, GetUserId(), IsSuperAdmin());
-            if (product == null) return NotFound($"المنتج غير موجود، التصنيف خاطئ، أو ليس لديك صلاحية لتعديله.");
-            return Ok(product);
+
+            if (product == null)
+                return NotFound(ApiResponse.Error(
+                    "المنتج غير موجود أو ليس لديك صلاحية أو التصنيف خطأ",
+                    "Product not found, invalid category, or access denied",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم تحديث المنتج بنجاح",
+                "Product updated successfully",
+                lang,
+                product));
         }
 
+        // ==========================================
+        // Delete
+        // ==========================================
         [HttpDelete("{id}")]
         [Authorize(Roles = AppRoles.SuperAdmin + "," + AppRoles.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
-            var isDeleted = await _productService.DeleteProductAsync(id, GetUserId(), IsSuperAdmin());
-            if (!isDeleted) return NotFound($"المنتج رقم {id} غير موجود أو ليس لديك صلاحية لحذفه.");
-            return Ok("تم حذف المنتج بنجاح.");
-        }
+            var lang = GetLang();
 
-        [HttpGet("public")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetPublicProducts()
-        {
-            var products = await _productService.GetAllProductsAsync(string.Empty, true);
-            return Ok(products);
+            var isDeleted = await _productService.DeleteProductAsync(id, GetUserId(), IsSuperAdmin());
+
+            if (!isDeleted)
+                return NotFound(ApiResponse.Error(
+                    $"المنتج رقم {id} غير موجود أو ليس لديك صلاحية",
+                    $"Product with id {id} not found or access denied",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم حذف المنتج بنجاح",
+                "Product deleted successfully",
+                lang));
         }
     }
 }

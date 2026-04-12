@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using EcommerceAPI.Constants;
+using Microsoft.OpenApi.Models;
 using System.Text;
+using EcommerceAPI.Middlewares;
+// 👇 هذه المكتبة تأتي تلقائياً بعد تثبيت Swashbuckle
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,58 +53,65 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
-// 👇 التعديل الجديد: إعداد Swagger ليدعم إدخال الـ Token
-builder.Services.AddSwaggerGen();
+// 👇 5. إعداد Swagger بالطريقة المستقرة ليدعم زر إدخال التوكن
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Ecommerce API", Version = "v1" });
+
+    // تعريف نوع الحماية
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "أدخل التوكن (Token) الخاص بك هنا مباشرة:"
+    });
+
+    // تطبيق الحماية
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
-
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-
-
-
-
-
-
-
-
-//   "ConnectionStrings": {
-//     "DefaultConnection": "Server=db46915.databaseasp.net; Database=db46915; User Id=db46915; Password=o?7GKj#34Fr=; Encrypt=False; MultipleActiveResultSets=True"
-//   },
-
-
-
- {/*
- "ConnectionStrings": {
-"DefaultConnection": "Server=.;Database=EcommerceDB;Trusted_Connection=True;TrustServerCertificate=True;"
-},
- */}
+app.UseMiddleware<ExceptionMiddleware>();
+// 👇 6. تشغيل واجهة Swagger
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-// 5. تفعيل الحماية (يجب أن يكون الترتيب Authentication ثم Authorization)
+// 7. تفعيل الحماية (يجب أن يكون الترتيب Authentication ثم Authorization)
 app.UseAuthentication(); 
 app.UseAuthorization();
 
-// 6. تشغيل الـ Controllers
+// 8. تشغيل الـ Controllers
 app.MapControllers();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
 
-// زراعة البيانات الافتراضية (الصلاحيات ومدير النظام)
-// كود تقريبي لوضعه في Program.cs بعد app.Run() أو قبلها
+// 9. زراعة البيانات الافتراضية (الصلاحيات ومدير النظام)
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    // 1. التأكد من وجود الأدوار (Roles)
     string[] roles = { AppRoles.SuperAdmin, AppRoles.Admin, AppRoles.User };
     foreach (var role in roles)
     {
@@ -109,7 +119,6 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // 2. إنشاء السوبر أدمن اليدوي
     var superAdminEmail = "superadmin@ecommerce.com";
     var user = await userManager.FindByEmailAsync(superAdminEmail);
 
@@ -122,13 +131,12 @@ using (var scope = app.Services.CreateScope())
             EmailConfirmed = true
         };
 
-        var result = await userManager.CreateAsync(superAdmin, "Super@Admin2026!"); // الباسورد اليدوي
+        var result = await userManager.CreateAsync(superAdmin, "Super@Admin2026!"); 
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(superAdmin, AppRoles.SuperAdmin);
         }
     }
 }
-
 
 app.Run();

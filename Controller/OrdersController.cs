@@ -10,7 +10,7 @@ namespace EcommerceAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // يجب أن يكون المستخدم مسجلاً للدخول للوصول للأوردرات
+    [Authorize]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -20,53 +20,91 @@ namespace EcommerceAPI.Controllers
             _orderService = orderService;
         }
 
-        // مساعدة: استخراج الـ ID الخاص بالمستخدم الحالي من التوكن
-        private string GetUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        private string GetUserId() =>
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
 
-        // 1. إنشاء طلب جديد (متاح لجميع المستخدمين المسجلين)
+        private string GetLang() =>
+            Request.Headers["Accept-Language"].ToString();
+
+        // ==========================================
+        // Create Order
+        // ==========================================
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
         {
-            try
-            {
-                // نمرر الـ UserId المستخرج من التوكن لضمان أن الأوردر يتسجل باسم صاحبه
-                var order = await _orderService.CreateOrderAsync(dto);
-                return Ok(order);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var lang = GetLang();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse.Error(
+                    "بيانات غير صحيحة",
+                    "Invalid data",
+                    lang));
+
+            var order = await _orderService.CreateOrderAsync(dto);
+
+            return Ok(ApiResponse.Success(
+                "تم إنشاء الطلب بنجاح",
+                "Order created successfully",
+                lang,
+                order));
         }
 
-        // 2. السوبر أدمن يشوف كل الأوردرات في النظام
+        // ==========================================
+        // SuperAdmin - All Orders
+        // ==========================================
         [HttpGet("all-orders")]
         [Authorize(Roles = AppRoles.SuperAdmin)]
         public async Task<IActionResult> GetAllOrders()
         {
-            // نفترض وجود دالة GetAllOrdersAsync في الـ Service
-            var orders = await _orderService.GetAllOrdersAsync(); 
-            return Ok(orders);
+            var lang = GetLang();
+
+            var orders = await _orderService.GetAllOrdersAsync();
+
+            return Ok(ApiResponse.Success(
+                "تم جلب جميع الطلبات",
+                "All orders fetched successfully",
+                lang,
+                orders));
         }
 
-        // 3. المستخدم يشوف الأوردرات الخاصة به فقط
+        // ==========================================
+        // User Orders
+        // ==========================================
         [HttpGet("my-orders")]
         public async Task<IActionResult> GetMyOrders()
         {
-            // نستخدم الـ ID المستخرج من التوكن لضمان الخصوصية
+            var lang = GetLang();
+
             var orders = await _orderService.GetUserOrdersAsync(GetUserId());
-            return Ok(orders);
+
+            return Ok(ApiResponse.Success(
+                "تم جلب طلباتك",
+                "Your orders fetched successfully",
+                lang,
+                orders));
         }
 
-        // 4. السوبر أدمن فقط هو من يعدل حالة الأوردر (قيد التنفيذ، تم الشحن، إلخ)
+        // ==========================================
+        // Update Status
+        // ==========================================
         [HttpPut("{id}/status")]
         [Authorize(Roles = AppRoles.SuperAdmin)]
         public async Task<IActionResult> UpdateStatus(int id, [FromQuery] OrderStatus newStatus)
         {
-            var isUpdated = await _orderService.UpdateOrderStatusAsync(id, newStatus);
-            if (!isUpdated) return NotFound("الطلب غير موجود.");
+            var lang = GetLang();
 
-            return Ok(new { Message = "تم تحديث حالة الطلب بنجاح." });
+            var isUpdated = await _orderService.UpdateOrderStatusAsync(id, newStatus);
+
+            if (!isUpdated)
+                return NotFound(ApiResponse.Error(
+                    "الطلب غير موجود",
+                    "Order not found",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم تحديث حالة الطلب بنجاح",
+                "Order status updated successfully",
+                lang));
         }
     }
 }

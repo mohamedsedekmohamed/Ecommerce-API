@@ -18,12 +18,14 @@ namespace EcommerceAPI.Services
         {
             var categories = await _context.Categories.ToListAsync();
             // تحويل الـ Model إلى DTO
-            return categories.Select(c => new CategoryDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description
-            });
+         return categories.Select(c => new CategoryDto
+{
+    Id = c.Id,
+    Name = c.Name,
+    NameAR = c.NameAR,
+    Description = c.Description,
+    DescriptionAR = c.DescriptionAR
+});
         }
 
         public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
@@ -31,20 +33,24 @@ namespace EcommerceAPI.Services
             var category = await _context.Categories.FindAsync(id);
             if (category == null) return null;
 
-            return new CategoryDto
-            {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description
-            };
+         return new CategoryDto
+{
+    Id = category.Id,
+    Name = category.Name,
+    NameAR = category.NameAR,
+    Description = category.Description,
+    DescriptionAR = category.DescriptionAR
+};
         }
 
         public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto dto)
         {
             var category = new Category
             {
-                Name = dto.Name,
-                Description = dto.Description
+  Name = dto.Name,
+        NameAR = dto.NameAR,
+        Description = dto.Description,
+        DescriptionAR = dto.DescriptionAR
             };
 
             await _context.Categories.AddAsync(category);
@@ -52,9 +58,10 @@ namespace EcommerceAPI.Services
 
             return new CategoryDto
             {
-                Id = category.Id,
-                Name = category.Name,
-                Description = category.Description
+                 Name = dto.Name,
+    NameAR = dto.NameAR,
+    Description = dto.Description,
+    DescriptionAR = dto.DescriptionAR
             };
         }
 
@@ -65,6 +72,8 @@ namespace EcommerceAPI.Services
 
             category.Name = dto.Name;
             category.Description = dto.Description;
+            category.NameAR = dto.NameAR;
+            category.DescriptionAR = dto.DescriptionAR;
 
             await _context.SaveChangesAsync();
 
@@ -72,7 +81,9 @@ namespace EcommerceAPI.Services
             {
                 Id = category.Id,
                 Name = category.Name,
-                Description = category.Description
+                NameAR = category.NameAR,
+                Description = category.Description,
+                DescriptionAR = category.DescriptionAR
             };
         }
 
@@ -91,7 +102,9 @@ namespace EcommerceAPI.Services
                 .Select(c => new CategorySelectDto
                 {
                     Id = c.Id,
-                    Name = c.Name
+                    Name = c.Name,
+                    NameAR = c.NameAR
+
                 })
                 .ToListAsync();
         }

@@ -13,5 +13,6 @@ namespace EcommerceAPI.Services
         Task<IEnumerable<UserDetailsDto>> GetUsersByRoleAsync(string roleName);
         Task<bool> UpdateAdminBySuperAdminAsync(string adminId, UpdateAdminDto model);
         Task<AuthModel> LoginAsync(LoginDto model, string requiredRole);
+        Task<IEnumerable<AdminDto>> GetAdminsAsync();
     }
 }

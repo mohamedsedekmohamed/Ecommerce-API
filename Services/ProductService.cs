@@ -18,7 +18,7 @@ namespace EcommerceAPI.Services
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
 
-            // 👈 لو مش سوبر أدمن، فلتر المنتجات عشان يجيب اللي هو ضافها بس
+       
             if (!isSuperAdmin && !string.IsNullOrEmpty(userId))
             {
                 query = query.Where(p => p.CreatedByUserId == userId);
@@ -26,17 +26,24 @@ namespace EcommerceAPI.Services
 
             var products = await query.ToListAsync();
             
-            return products.Select(p => new ProductDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                ImageUrl = p.ImageUrl,
-                Stock = p.Stock,
-                CategoryId = p.CategoryId,
-                CategoryName = p.Category?.Name ?? "بدون تصنيف"
-            });
+        return products.Select(p => new ProductDto
+{
+    Id = p.Id,
+
+    Name = p.Name,
+    NameAR = p.NameAR,
+
+    Description = p.Description,
+    DescriptionAR = p.DescriptionAR,
+
+    Price = p.Price,
+    ImageUrl = p.ImageUrl,
+    Stock = p.Stock,
+    CategoryId = p.CategoryId,
+
+    CategoryName = p.Category?.Name ?? "بدون تصنيف",
+    CategoryNameAR = p.Category?.NameAR ?? "بدون تصنيف"
+});
         }
 
         public async Task<ProductDto?> GetProductByIdAsync(int id, string userId, bool isSuperAdmin)
@@ -66,16 +73,18 @@ namespace EcommerceAPI.Services
             var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId);
             if (!categoryExists) return null; 
 
-            var product = new Product
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                ImageUrl = dto.ImageUrl,
-                Stock = dto.Stock,
-                CategoryId = dto.CategoryId,
-                CreatedByUserId = userId // 👈 نسجل الـ ID الخاص بالأدمن اللي ضاف المنتج
-            };
+          var product = new Product
+{
+    Name = dto.Name,
+    NameAR = dto.NameAR,
+    Description = dto.Description,
+    DescriptionAR = dto.DescriptionAR,
+    Price = dto.Price,
+    ImageUrl = dto.ImageUrl,
+    Stock = dto.Stock,
+    CategoryId = dto.CategoryId,
+    CreatedByUserId = userId
+};
 
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
@@ -101,6 +110,9 @@ namespace EcommerceAPI.Services
             product.ImageUrl = dto.ImageUrl;
             product.Stock = dto.Stock;
             product.CategoryId = dto.CategoryId;
+            product.NameAR = dto.NameAR;
+            product.DescriptionAR = dto.DescriptionAR;
+
 
             await _context.SaveChangesAsync();
             return await GetProductByIdAsync(product.Id, userId, true);

@@ -11,7 +11,6 @@ D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Azure.Identity.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Humanizer.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
-D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Microsoft.AspNetCore.OpenApi.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Microsoft.Bcl.Cryptography.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\Microsoft.Build.Framework.dll
@@ -169,3 +168,4 @@ D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\publish\EcommerceAPI.deps.json
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\publish\EcommerceAPI.runtimeconfig.json
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\publish\EcommerceAPI.staticwebassets.endpoints.json
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\staticwebassets.upToDateCheck.txt
+D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\EcommerceAPI.sourcelink.json

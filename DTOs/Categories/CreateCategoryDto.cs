@@ -4,9 +4,10 @@ namespace EcommerceAPI.DTOs.Categories
 {
     public class CreateCategoryDto
     {
-        [Required(ErrorMessage = "اسم التصنيف مطلوب")]
-        public string Name { get; set; } = string.Empty;
+            public required string Name { get; set; }
+    public required string NameAR { get; set; }
 
-        public string Description { get; set; } = string.Empty;
+    public  required string Description { get; set; }
+    public required string DescriptionAR { get; set; }
     }
 }

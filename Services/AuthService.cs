@@ -93,32 +93,40 @@ namespace EcommerceAPI.Services
         }
 
         // 3. إضافة أدمن جديد (خاص بالـ SuperAdmin)
-        public async Task<AuthModel> AddAdminAsync(AddAdminDto model)
-        {
-            if (await _userManager.FindByEmailAsync(model.Email) != null)
-                return new AuthModel { Message = "الإيميل مسجل بالفعل!" };
+       public async Task<AuthModel> AddAdminAsync(AddAdminDto model)
+{
+    if (await _userManager.FindByEmailAsync(model.Email) != null)
+        return new AuthModel { Message = "الإيميل مسجل بالفعل!" };
 
-            var user = new ApplicationUser
-            {
-                UserName = model.Email,
-                Email = model.Email,
-                FullName = model.Name // تم افتراض أن حقل الاسم في الـ DTO اسمه Name
-            };
+    var user = new ApplicationUser
+    {
+        UserName = model.Email,
+        Email = model.Email,
+        FullName = model.Name
+    };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+    var result = await _userManager.CreateAsync(user, model.Password);
 
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return new AuthModel { Message = errors };
-            }
+    if (!result.Succeeded)
+    {
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        return new AuthModel { Message = errors };
+    }
 
-            // إعطاء المستخدم رتبة Admin بدلاً من User
-            await _userManager.AddToRoleAsync(user, AppRoles.Admin);
+    // ✅ التحقق من الـ Role
+    var role = model.Role == AppRoles.SuperAdmin 
+        ? AppRoles.SuperAdmin 
+        : AppRoles.Admin;
 
-            return new AuthModel { Message = "تم إضافة الأدمن بنجاح!", IsAuthenticated = true, Email = user.Email };
-        }
+    await _userManager.AddToRoleAsync(user, role);
 
+    return new AuthModel
+    {
+        Message = "تم إضافة الأدمن بنجاح!",
+        IsAuthenticated = true,
+        Email = user.Email
+    };
+}
         // 4. تعديل بيانات الحساب (الاسم والإيميل)
         public async Task<bool> UpdateUserAsync(string userId, UpdateUserDto model)
         {
@@ -200,6 +208,20 @@ namespace EcommerceAPI.Services
         }
 
 
-        
+        public async Task<IEnumerable<AdminDto>> GetAdminsAsync()
+{
+    var admins = await _userManager.GetUsersInRoleAsync(AppRoles.Admin);
+    var superAdmins = await _userManager.GetUsersInRoleAsync(AppRoles.SuperAdmin);
+
+    var allAdmins = admins.Concat(superAdmins).Distinct();
+
+    return allAdmins.Select(user => new AdminDto
+    {
+        Id = user.Id,
+        Name = user.FullName ?? "",
+        Email = user.Email ?? "",
+        Roles = _userManager.GetRolesAsync(user).Result
+    });
+}
     }
 }

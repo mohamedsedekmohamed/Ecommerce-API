@@ -9,7 +9,7 @@ namespace EcommerceAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // يجب أن يكون المستخدم مسجلاً للدخول للوصول لأي مسار هنا
+    [Authorize]
     public class AdminController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -19,115 +19,185 @@ namespace EcommerceAPI.Controllers
             _authService = authService;
         }
 
-        // 1. إضافة أدمن جديد (مسموح فقط للـ SuperAdmin)
+        private string GetLang() =>
+            Request.Headers["Accept-Language"].ToString();
+[HttpGet("admins")]
+[Authorize(Roles = AppRoles.SuperAdmin)]
+public async Task<IActionResult> GetAdmins()
+{
+    var lang = GetLang();
+
+    var admins = await _authService.GetAdminsAsync();
+
+    return Ok(ApiResponse.Success( "تم جلب المدراء بنجاح", "Admins fetched successfully", lang));
+}
+[HttpPut("update-superadmin-profile")]
+[Authorize(Roles = AppRoles.SuperAdmin)]
+public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProfileDto model)
+{
+    var lang = GetLang();
+
+    if (!ModelState.IsValid)
+        return BadRequest(ApiResponse.Error("بيانات غير صحيحة", "Invalid data", lang));
+
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (userId == null)
+        return Unauthorized(ApiResponse.Error("غير مصرح", "Unauthorized", lang));
+
+    var updateDto = new UpdateUserDto
+    {
+        Name = model.Name,
+        Email = model.Email
+    };
+
+    var result = await _authService.UpdateUserAsync(userId, updateDto);
+
+    if (!result)
+        return BadRequest(ApiResponse.Error(
+            "فشل تحديث البيانات",
+            "Failed to update profile",
+            lang));
+
+    return Ok(ApiResponse.Success(
+        "تم تحديث بيانات السوبر أدمن",
+        "SuperAdmin profile updated",
+        lang));
+}
+        // 1. إضافة أدمن
         [HttpPost("add-admin")]
-        [Authorize(Roles = AppRoles.SuperAdmin)] 
+        [Authorize(Roles = AppRoles.SuperAdmin)]
         public async Task<IActionResult> AddAdmin([FromBody] AddAdminDto model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var lang = GetLang();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse.Error("بيانات غير صحيحة", "Invalid data", lang));
 
             var result = await _authService.AddAdminAsync(model);
-            if (!result.IsAuthenticated) return BadRequest(result.Message);
 
-            return Ok(result);
+            if (!result.IsAuthenticated)
+                return BadRequest(ApiResponse.Error(result.Message, result.Message, lang));
+
+            return Ok(ApiResponse.Success("تم إضافة الأدمن بنجاح", "Admin added successfully", lang));
         }
 
- // 2. تعديل بيانات وباسورد أدمن آخر (مسموح فقط للـ SuperAdmin)
+        // 2. تعديل أدمن
         [HttpPut("update-admin/{adminId}")]
         [Authorize(Roles = AppRoles.SuperAdmin)]
-        public async Task<IActionResult> UpdateAdmin(string adminId, [FromBody] UpdateAdminDto model) // 👈 استخدمنا DTO الجديد هنا
+        public async Task<IActionResult> UpdateAdmin(string adminId, [FromBody] UpdateAdminDto model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var lang = GetLang();
 
-            // 👈 استدعينا الدالة الجديدة
-            var result = await _authService.UpdateAdminBySuperAdminAsync(adminId, model); 
-            
-            if (!result) return BadRequest("حدث خطأ أثناء تحديث بيانات الأدمن.");
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse.Error("بيانات غير صحيحة", "Invalid data", lang));
 
-            return Ok(new { Message = "تم تحديث بيانات الأدمن بنجاح." });
+            var result = await _authService.UpdateAdminBySuperAdminAsync(adminId, model);
+
+            if (!result)
+                return BadRequest(ApiResponse.Error(
+                    "حدث خطأ أثناء تحديث بيانات الأدمن",
+                    "Error updating admin",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم تحديث بيانات الأدمن بنجاح",
+                "Admin updated successfully",
+                lang));
         }
-     
 
-        // 4. مسح الحساب الشخصي لنفسه
+        // حذف حسابي
         [HttpDelete("delete-my-account")]
         public async Task<IActionResult> DeleteMyAccount()
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserId == null) return Unauthorized();
+            var lang = GetLang();
 
-            var result = await _authService.DeleteUserAsync(currentUserId);
-            if (!result) return BadRequest("حدث خطأ أثناء محاولة مسح الحساب.");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized(ApiResponse.Error("غير مصرح", "Unauthorized", lang));
 
-            return Ok(new { Message = "تم مسح حسابك بنجاح." });
+            var result = await _authService.DeleteUserAsync(userId);
+
+            if (!result)
+                return BadRequest(ApiResponse.Error(
+                    "حدث خطأ أثناء حذف الحساب",
+                    "Error deleting account",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم حذف حسابك بنجاح",
+                "Account deleted successfully",
+                lang));
         }
-   // 3. تعديل بيانات الحساب الشخصي لنفسه (متاح لأي شخص مسجل الدخول)
-     // مسار واحد لتعديل الحساب الشخصي (الاسم، الإيميل، وكلمة المرور إذا أراد)
+
+        // تعديل حسابي
         [HttpPut("update-my-profile")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateMyProfileDto model)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var lang = GetLang();
 
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (currentUserId == null) return Unauthorized();
+            if (!ModelState.IsValid)
+                return BadRequest(ApiResponse.Error("بيانات غير صحيحة", "Invalid data", lang));
 
-            // 1. تحديث البيانات الأساسية (الاسم والإيميل)
-            // قمنا بتجهيز الـ DTO القديم الذي تعتمده الـ Service حالياً
-            var updateBasicInfoDto = new UpdateUserDto 
-            { 
-                Name = model.Name, 
-                Email = model.Email 
-            };
-            
-            var profileResult = await _authService.UpdateUserAsync(currentUserId, updateBasicInfoDto);
-            if (!profileResult) return BadRequest("حدث خطأ أثناء تحديث البيانات الأساسية.");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized(ApiResponse.Error("غير مصرح", "Unauthorized", lang));
 
-            // 2. تحديث كلمة المرور (فقط إذا قام بكتابة الباسورد القديم والجديد)
-            if (!string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.NewPassword))
+            var updateDto = new UpdateUserDto
             {
-                var changePassDto = new ChangePasswordDto 
-                { 
-                    CurrentPassword = model.CurrentPassword, 
-                    NewPassword = model.NewPassword 
-                };
-                
-                var passResult = await _authService.ChangePasswordAsync(currentUserId, changePassDto);
-                
-                // لو البيانات اتعدلت بس الباسورد القديم كان غلط
-                if (!passResult) 
-                    return BadRequest("تم تحديث بياناتك (الاسم والإيميل)، ولكن فشل تغيير كلمة المرور لأن كلمة المرور الحالية غير صحيحة.");
+                Name = model.Name,
+                Email = model.Email
+            };
+
+            var result = await _authService.UpdateUserAsync(userId, updateDto);
+
+            if (!result)
+                return BadRequest(ApiResponse.Error(
+                    "فشل تحديث البيانات",
+                    "Failed to update profile",
+                    lang));
+
+            if (!string.IsNullOrEmpty(model.CurrentPassword) &&
+                !string.IsNullOrEmpty(model.NewPassword))
+            {
+                var passResult = await _authService.ChangePasswordAsync(userId,
+                    new ChangePasswordDto
+                    {
+                        CurrentPassword = model.CurrentPassword,
+                        NewPassword = model.NewPassword
+                    });
+
+                if (!passResult)
+                    return BadRequest(ApiResponse.Error(
+                        "تم تحديث البيانات لكن كلمة المرور غير صحيحة",
+                        "Profile updated but password is incorrect",
+                        lang));
             }
 
-            return Ok(new { Message = "تم تحديث بيانات حسابك بنجاح." });
-        }
-        // 👇 الدوال الجديدة للـ SuperAdmin 👇
-
-        // 6. عرض كل المديرين (Admins)
-        [HttpGet("all-admins")]
-        [Authorize(Roles = AppRoles.SuperAdmin)]
-        public async Task<IActionResult> GetAllAdmins()
-        {
-            var admins = await _authService.GetUsersByRoleAsync(AppRoles.Admin);
-            return Ok(admins);
+            return Ok(ApiResponse.Success(
+                "تم تحديث الحساب بنجاح",
+                "Profile updated successfully",
+                lang));
         }
 
-        // 7. عرض كل المستخدمين العاديين (Users)
-        [HttpGet("all-users")]
-        [Authorize(Roles = AppRoles.SuperAdmin)]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var users = await _authService.GetUsersByRoleAsync(AppRoles.User);
-            return Ok(users);
-        }
-
+        // حذف مستخدم
         [HttpDelete("delete-user/{userId}")]
-        [Authorize(Roles = AppRoles.SuperAdmin)] // 👈 السوبر أدمن فقط هو من يملك هذه الصلاحية المطلقة
+        [Authorize(Roles = AppRoles.SuperAdmin)]
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            var result = await _authService.DeleteUserAsync(userId);
-            
-            if (!result) return NotFound("المستخدم غير موجود أو حدث خطأ أثناء الحذف.");
+            var lang = GetLang();
 
-            return Ok(new { Message = "تم مسح الحساب بنجاح." });
+            var result = await _authService.DeleteUserAsync(userId);
+
+            if (!result)
+                return NotFound(ApiResponse.Error(
+                    "المستخدم غير موجود",
+                    "User not found",
+                    lang));
+
+            return Ok(ApiResponse.Success(
+                "تم حذف الحساب بنجاح",
+                "User deleted successfully",
+                lang));
         }
     }
 }

@@ -18,7 +18,6 @@ D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Azure.Identity.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Humanizer.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
-D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Microsoft.AspNetCore.OpenApi.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Microsoft.Bcl.AsyncInterfaces.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Microsoft.Bcl.Cryptography.dll
 D:\EcommerceAPI\EcommerceAPI\bin\Release\net10.0\win-x86\Microsoft.Build.Framework.dll
@@ -165,3 +164,4 @@ D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\refint\EcommerceAPI.dll
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\EcommerceAPI.pdb
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\EcommerceAPI.genruntimeconfig.cache
 D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\ref\EcommerceAPI.dll
+D:\EcommerceAPI\EcommerceAPI\obj\Release\net10.0\win-x86\EcommerceAPI.sourcelink.json
