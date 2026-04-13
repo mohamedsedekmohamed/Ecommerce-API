@@ -1,4 +1,4 @@
-    using EcommerceAPI.Data;
+using EcommerceAPI.Data;
 using EcommerceAPI.DTOs.Orders;
 using EcommerceAPI.Enums;
 using EcommerceAPI.Models;
@@ -15,76 +15,132 @@ namespace EcommerceAPI.Services
             _context = context;
         }
 
-        public async Task<OrderResponseDto?> CreateOrderAsync(CreateOrderDto dto)
+        // ==========================================
+        // إنشاء طلب جديد
+        // ==========================================
+        public async Task<OrderResponseDto?> CreateOrderAsync(CreateOrderDto dto, string userId)
         {
-            // 1. التأكد من وجود المستخدم
-            var userExists = await _context.Users.AnyAsync(u => u.Id == dto.UserId);
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
             if (!userExists) throw new Exception("المستخدم غير موجود");
 
             decimal totalAmount = 0;
             var orderItems = new List<OrderItem>();
 
-            // 2. المرور على كل المنتجات المطلوبة لحساب السعر وخصم المخزون
             foreach (var item in dto.Items)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                
                 if (product == null) throw new Exception($"المنتج رقم {item.ProductId} غير موجود.");
-                if (product.Stock < item.Quantity) throw new Exception($"الكمية المطلوبة من {product.Name} غير متوفرة في المخزون.");
+                if (product.Stock < item.Quantity) throw new Exception($"الكمية المطلوبة من {product.Name} غير متوفرة.");
 
-                // حساب الإجمالي
                 totalAmount += (product.Price * item.Quantity);
-
-                // خصم المخزون
                 product.Stock -= item.Quantity;
 
-                // تجهيز عنصر الطلب للفاتورة
                 orderItems.Add(new OrderItem
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    UnitPrice = product.Price // نأخذ السعر من الداتابيز وليس من المستخدم
+                    UnitPrice = product.Price,
+                    Product = product 
                 });
             }
 
-            // 3. إنشاء الطلب النهائي
             var order = new Order
             {
-                UserId = dto.UserId,
+                UserId = userId,
                 TotalAmount = totalAmount,
                 Status = OrderStatus.Preparing,
-                OrderItems = orderItems
+                OrderItems = orderItems,
+                ShippingAddress = dto.ShippingAddress, // 👈 أخذ العنوان من المستخدم
+                PhoneNumber = dto.PhoneNumber,
             };
 
             await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync(); // هنا يتم حفظ الطلب، وعناصر الطلب، وتحديث المخزون معاً!
+            await _context.SaveChangesAsync();
 
             return new OrderResponseDto
             {
                 OrderId = order.Id,
                 OrderDate = order.OrderDate,
                 TotalAmount = order.TotalAmount,
+                ShippingAddress = order.ShippingAddress, // 👈 إرجاعها في الرد
+                PhoneNumber = order.PhoneNumber,
                 Status = order.Status.ToString(),
-                UserId = order.UserId
+                UserId = order.UserId,
+                Items = orderItems.Select(oi => new OrderItemResponseDto
+                {
+                    ProductId = oi.ProductId,
+                    ProductName = oi.Product?.Name ?? "N/A",      // إنجليزي
+                    ProductNameAR = oi.Product?.NameAR ?? "غير متوفر", // عربي
+                    Quantity = oi.Quantity,
+                    UnitPrice = oi.UnitPrice
+                }).ToList()
             };
         }
 
-    public async Task<IEnumerable<OrderResponseDto>> GetUserOrdersAsync(string userId)
+        // ==========================================
+        // جلب طلبات المستخدم الحالي
+        // ==========================================
+        public async Task<IEnumerable<OrderResponseDto>> GetUserOrdersAsync(string userId)
         {
             var orders = await _context.Orders
                 .Where(o => o.UserId == userId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
 
             return orders.Select(o => new OrderResponseDto
             {
-                OrderId = o.Id, 
+                OrderId = o.Id,
+                ShippingAddress = o.ShippingAddress, // 👈 جلب من الداتا بيز
+                PhoneNumber = o.PhoneNumber,
                 OrderDate = o.OrderDate,
                 TotalAmount = o.TotalAmount,
-                Status = o.Status.ToString(), 
-                UserId = o.UserId
+                Status = o.Status.ToString(),
+                UserId = o.UserId,
+                Items = o.OrderItems.Select(oi => new OrderItemResponseDto
+                {
+                    ProductId = oi.ProductId,
+                    ProductName = oi.Product.Name,
+                    
+                    ProductNameAR = oi.Product.NameAR, // الاسم بالعربي
+                    Quantity = oi.Quantity,
+                    UnitPrice = oi.UnitPrice
+                }).ToList()
             });
         }
+
+        // ==========================================
+        // جلب جميع الطلبات (للسوبر أدمن)
+        // ==========================================
+        public async Task<IEnumerable<OrderResponseDto>> GetAllOrdersAsync()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+
+            return orders.Select(o => new OrderResponseDto
+            {
+                OrderId = o.Id,
+                ShippingAddress = o.ShippingAddress, // 👈 جلب من الداتا بيز
+                PhoneNumber = o.PhoneNumber,
+                OrderDate = o.OrderDate,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status.ToString(),
+                UserId = o.UserId,
+                Items = o.OrderItems.Select(oi => new OrderItemResponseDto
+                {
+                    ProductId = oi.ProductId,
+                    ProductName = oi.Product?.Name ?? "N/A",
+                    ProductNameAR = oi.Product?.NameAR ?? "غير متوفر", // الاسم بالعربي
+                    Quantity = oi.Quantity,
+                    UnitPrice = oi.UnitPrice
+                }).ToList()
+            });
+        }
+
         public async Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus)
         {
             var order = await _context.Orders.FindAsync(orderId);
@@ -93,22 +149,6 @@ namespace EcommerceAPI.Services
             order.Status = newStatus;
             await _context.SaveChangesAsync();
             return true;
-        }
-        // 👇 إضافة الدالة الجديدة داخل OrderService
-      public async Task<IEnumerable<OrderResponseDto>> GetAllOrdersAsync()
-        {
-            var orders = await _context.Orders
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
-
-            return orders.Select(o => new OrderResponseDto
-            {
-                OrderId = o.Id, // 👈 تم التعديل لتطابق الـ DTO الخاص بك
-                OrderDate = o.OrderDate,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status.ToString(), // 👈 تحويل الـ Enum إلى String
-                UserId = o.UserId
-            });
         }
     }
 }

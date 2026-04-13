@@ -12,7 +12,8 @@ namespace EcommerceAPI.Models
         public decimal TotalAmount { get; set; }
 
         public OrderStatus Status { get; set; } = OrderStatus.Preparing;
-
+    public string ShippingAddress { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
         // علاقة: الطلب ينتمي لمستخدم واحد
         public string UserId { get; set; } = string.Empty;
         public ApplicationUser? User { get; set; }

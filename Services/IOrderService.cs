@@ -5,7 +5,7 @@ namespace EcommerceAPI.Services
 {
     public interface IOrderService
     {
-        Task<OrderResponseDto?> CreateOrderAsync(CreateOrderDto dto);
+Task<OrderResponseDto?> CreateOrderAsync(CreateOrderDto dto, string userId);
         Task<IEnumerable<OrderResponseDto>> GetUserOrdersAsync(string userId);
         Task<bool> UpdateOrderStatusAsync(int orderId, OrderStatus newStatus);
         

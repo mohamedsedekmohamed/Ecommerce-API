@@ -29,25 +29,33 @@ namespace EcommerceAPI.Controllers
         // ==========================================
         // Create Order
         // ==========================================
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
-        {
-            var lang = GetLang();
+       [HttpPost]
+public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
+{
+    var lang = GetLang();
 
-            if (!ModelState.IsValid)
-                return BadRequest(ApiResponse.Error(
-                    "بيانات غير صحيحة",
-                    "Invalid data",
-                    lang));
+    if (!ModelState.IsValid)
+        return BadRequest(ApiResponse.Error("بيانات غير صحيحة", "Invalid data", lang));
 
-            var order = await _orderService.CreateOrderAsync(dto);
+    try 
+    {
+        // سحب الـ UserId من الـ Token عبر الميثود الموجودة في الكنترولر
+        var userId = GetUserId(); 
 
-            return Ok(ApiResponse.Success(
-                "تم إنشاء الطلب بنجاح",
-                "Order created successfully",
-                lang,
-                order));
-        }
+        // إرسال الـ DTO مع الـ UserId للخدمة
+        var order = await _orderService.CreateOrderAsync(dto, userId);
+
+        return Ok(ApiResponse.Success(
+            "تم إنشاء الطلب بنجاح",
+            "Order created successfully",
+            lang,
+            order));
+    }
+    catch (Exception ex)
+    {
+        return BadRequest(ApiResponse.Error(ex.Message, ex.Message, lang));
+    }
+}
 
         // ==========================================
         // SuperAdmin - All Orders

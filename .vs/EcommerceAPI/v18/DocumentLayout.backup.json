@@ -48,7 +48,7 @@
               "RelativeDocumentMoniker": "appsettings.json",
               "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\appsettings.json",
               "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-04-11T10:43:37.042Z",
               "EditorCaption": ""
@@ -86,8 +86,7 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAFsAAAAAAAAAAAAQwGQAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-06T15:11:18.83Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-06T15:11:18.83Z"
             },
             {
               "$type": "Document",
