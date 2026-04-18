@@ -29,7 +29,7 @@ public async Task<IActionResult> GetAdmins()
 
     var admins = await _authService.GetAdminsAsync();
 
-    return Ok(ApiResponse.Success( "تم جلب المدراء بنجاح", "Admins fetched successfully", lang));
+    return Ok(ApiResponse.Success( "تم جلب المدراء بنجاح", "Admins fetched successfully", lang,admins));
 }
 [HttpPut("update-superadmin-profile")]
 [Authorize(Roles = AppRoles.SuperAdmin)]
@@ -106,11 +106,14 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
         }
 
         // حذف حسابي
+       // 1. حذف حسابي الشخصي (لأي مستخدم مسجل دخول)
         [HttpDelete("delete-my-account")]
+        // مش محتاجين نحدد Role هنا لأن أي حد من حقه يحذف حسابه
         public async Task<IActionResult> DeleteMyAccount()
         {
             var lang = GetLang();
 
+            // بنجيب الـ ID بتاع الشخص اللي عامل Request من التوكن بتاعه
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized(ApiResponse.Error("غير مصرح", "Unauthorized", lang));
@@ -128,6 +131,7 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
                 "Account deleted successfully",
                 lang));
         }
+        
 
         // تعديل حسابي
         [HttpPut("update-my-profile")]
@@ -199,5 +203,8 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
                 "User deleted successfully",
                 lang));
         }
+
+        // 1. حذف حسابي الشخصي (لأي مستخدم مسجل دخول)
+      
     }
 }

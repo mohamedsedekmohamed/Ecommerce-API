@@ -25,13 +25,15 @@ namespace EcommerceAPI.Services
         public async Task<AuthModel> RegisterAsync(RegisterDto model)
         {
             if (await _userManager.FindByEmailAsync(model.Email) != null)
-                return new AuthModel { Message = "الإيميل مسجل بالفعل!" };
+return new AuthModel { ErrorCode = "EmailExists" };
 
             var user = new ApplicationUser
             {
                 UserName = model.Email,
                 Email = model.Email,
-                FullName = model.FullName
+                FullName = model.FullName,
+                PhoneNumber = model.PhoneNumber,
+        WhatsAppNumber = model.WhatsAppNumber
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -52,12 +54,12 @@ namespace EcommerceAPI.Services
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
-                return new AuthModel { Message = "الإيميل أو كلمة المرور غير صحيحة!" };
+              return new AuthModel { ErrorCode = "InvalidCredentials" };
 
             // 👇 التعديل الثاني الهام: التحقق من أن هذا المستخدم يمتلك الصلاحية المطلوبة للدخول من هذا المسار
             var hasRole = await _userManager.IsInRoleAsync(user, requiredRole);
             if (!hasRole)
-                return new AuthModel { Message = $"غير مصرح لك بالدخول كـ {requiredRole}!" };
+             return new AuthModel { ErrorCode = "UnauthorizedRole" };
 
             var authClaims = new List<Claim>
             {
@@ -89,14 +91,17 @@ namespace EcommerceAPI.Services
                 IsAuthenticated = true,
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 ExpiresOn = token.ValidTo,
+                Id = user.Id,        
+                 Email = user.Email,          
+                Username = user.UserName,     
+                Roles = userRoles.ToList()
             };
         }
 
-        // 3. إضافة أدمن جديد (خاص بالـ SuperAdmin)
        public async Task<AuthModel> AddAdminAsync(AddAdminDto model)
 {
     if (await _userManager.FindByEmailAsync(model.Email) != null)
-        return new AuthModel { Message = "الإيميل مسجل بالفعل!" };
+      return new AuthModel { ErrorCode = "EmailExists" };
 
     var user = new ApplicationUser
     {
@@ -109,8 +114,12 @@ namespace EcommerceAPI.Services
 
     if (!result.Succeeded)
     {
-        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        return new AuthModel { Message = errors };
+       var errorCode = result.Errors.First().Code;
+
+return new AuthModel 
+{ 
+    ErrorCode = errorCode // زي PasswordTooShort / PasswordRequiresDigit
+};
     }
 
     // ✅ التحقق من الـ Role
@@ -122,7 +131,7 @@ namespace EcommerceAPI.Services
 
     return new AuthModel
     {
-        Message = "تم إضافة الأدمن بنجاح!",
+      
         IsAuthenticated = true,
         Email = user.Email
     };

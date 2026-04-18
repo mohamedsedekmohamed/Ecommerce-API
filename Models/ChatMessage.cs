@@ -3,12 +3,19 @@ namespace EcommerceAPI.Models
     public class ChatMessage
     {
         public int Id { get; set; }
-        public string Message { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public bool IsAdminMessage { get; set; } // لمعرفة هل الرسالة من الإدارة أم من العميل
+        
+        // من أرسل الرسالة؟
+        public string SenderId { get; set; } 
+        
+        // لمين مبعوته؟ (للأدمن أو للمستخدم)
+        public string ReceiverId { get; set; } 
+        
+        public string Message { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsRead { get; set; }
 
-        // علاقة: الرسالة تنتمي لمستخدم معين (صاحب المشكلة أو الاستفسار)
-        public string UserId { get; set; } = string.Empty;
-        public ApplicationUser? User { get; set; }
+        // Navigation Properties (اختياري بس بيساعد لو عايز تجيب اسم المرسل)
+        public ApplicationUser Sender { get; set; }
+        public ApplicationUser Receiver { get; set; }
     }
 }

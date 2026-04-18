@@ -9,7 +9,8 @@ using EcommerceAPI.Constants;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using EcommerceAPI.Middlewares;
-// 👇 هذه المكتبة تأتي تلقائياً بعد تثبيت Swashbuckle
+using EcommerceAPI.Hubs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,7 +48,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>(); 
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-
+builder.Services.AddScoped<IAddressService, AddressService>();
 // 4. تفعيل استخدام الـ Controllers
 builder.Services.AddControllers();
 
@@ -85,7 +86,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
+builder.Services.AddSignalR();
 var app = builder.Build();
 app.UseMiddleware<ExceptionMiddleware>();
 // 👇 6. تشغيل واجهة Swagger
@@ -138,5 +139,5 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
-
+app.MapHub<ChatHub>("/chatHub");
 app.Run();

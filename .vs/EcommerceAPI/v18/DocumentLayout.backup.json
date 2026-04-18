@@ -7,6 +7,10 @@
       "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|d:\\ecommerceapi\\ecommerceapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5DC55AC5-3F42-9DBC-B445-8C52F2920A6D}|EcommerceAPI.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -30,8 +34,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "appsettings.Development.json",
+              "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\appsettings.Development.json",
+              "RelativeToolTip": "appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-16T08:31:16.444Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
@@ -48,14 +65,14 @@
               "RelativeDocumentMoniker": "appsettings.json",
               "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\appsettings.json",
               "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAACAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2026-04-11T10:43:37.042Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "sv3duoqn.sql",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\obj\\Debug\\net10.0\\sv3duoqn.sql",
               "RelativeDocumentMoniker": "obj\\Debug\\net10.0\\sv3duoqn.sql",
@@ -66,7 +83,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "EcommerceAPI.http",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\EcommerceAPI.http",
               "RelativeDocumentMoniker": "EcommerceAPI.http",
@@ -74,23 +91,25 @@
               "RelativeToolTip": "EcommerceAPI.http",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
-              "WhenOpened": "2026-04-06T15:11:21.216Z"
+              "WhenOpened": "2026-04-06T15:11:21.216Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "D:\\EcommerceAPI\\EcommerceAPI\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAFsAAAAAAAAAAAAQwGQAAAAbAAAAAAAAAA==",
+              "ViewState": "AgIAAFUAAAAAAAAAAAAQwGQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-06T15:11:18.83Z"
+              "WhenOpened": "2026-04-06T15:11:18.83Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "web.config",
               "DocumentMoniker": "D:\\EcommerceAPI\\EcommerceAPI\\publish\\web.config",
               "RelativeDocumentMoniker": "publish\\web.config",

@@ -2,8 +2,11 @@ namespace EcommerceAPI.Enums
 {
     public enum OrderStatus
     {
-        Preparing = 0,
-        OnTheWay = 1,
-        Delivered = 2
+        Received=0,
+        Preparing = 1,
+        OnTheWay = 2,
+        Delivered = 3,
+        Cancelled = 4
+ 
     }
 }

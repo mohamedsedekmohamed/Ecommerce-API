@@ -5,8 +5,7 @@ namespace EcommerceAPI.DTOs.Orders
     public class CreateOrderDto
     {
   
-[Required(ErrorMessage = "عنوان التوصيل مطلوب")]
-        public string ShippingAddress { get; set; } = string.Empty;
+public int AddressId { get; set; }
 
         [Required(ErrorMessage = "رقم الهاتف مطلوب")]
         [Phone(ErrorMessage = "صيغة رقم الهاتف غير صحيحة")]

@@ -19,65 +19,88 @@ namespace EcommerceAPI.Services
         // إنشاء طلب جديد
         // ==========================================
         public async Task<OrderResponseDto?> CreateOrderAsync(CreateOrderDto dto, string userId)
+{
+    var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+    if (!userExists) throw new Exception("المستخدم غير موجود");
+
+    // ==========================================
+    // 👈 1. جلب العنوان المختار والتحقق منه
+    // ==========================================
+    var userAddress = await _context.Addresses
+        .FirstOrDefaultAsync(a => a.Id == dto.AddressId && a.UserId == userId);
+
+    if (userAddress == null) 
+        throw new Exception("العنوان المختار غير موجود أو لا يخص هذا المستخدم.");
+
+    // تجميع العنوان في نص واحد لحفظه في الطلب
+    string fullShippingAddress = $"{userAddress.Street}, {userAddress.City}, {userAddress.State}, {userAddress.ZipCode}";
+
+    decimal totalAmount = 0;
+    var orderItems = new List<OrderItem>();
+
+    // ==========================================
+    // 2. التحقق من المنتجات
+    // ==========================================
+    foreach (var item in dto.Items)
+    {
+        var product = await _context.Products.FindAsync(item.ProductId);
+        if (product == null) throw new Exception($"المنتج رقم {item.ProductId} غير موجود.");
+        if (product.Stock < item.Quantity) throw new Exception($"الكمية المطلوبة من {product.Name} غير متوفرة.");
+
+        totalAmount += (product.Price * item.Quantity);
+        product.Stock -= item.Quantity; // تقليل المخزون
+
+        orderItems.Add(new OrderItem
         {
-            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
-            if (!userExists) throw new Exception("المستخدم غير موجود");
+            ProductId = item.ProductId,
+            Quantity = item.Quantity,
+            UnitPrice = product.Price,
+            Product = product 
+        });
+    }
 
-            decimal totalAmount = 0;
-            var orderItems = new List<OrderItem>();
+    // ==========================================
+    // 3. إنشاء الطلب
+    // ==========================================
+    var order = new Order
+    {
+        UserId = userId,
+        TotalAmount = totalAmount,
+        Status = OrderStatus.Preparing,
+        OrderItems = orderItems,
+        
+        // 👈 نضع العنوان المجمع هنا كـ Text
+        ShippingAddress = fullShippingAddress, 
+        
+        // يمكنك إما أخذ رقم الهاتف من الـ DTO أو من العنوان المختار
+        PhoneNumber = dto.PhoneNumber ?? userAddress.PhoneNumber,
+    };
 
-            foreach (var item in dto.Items)
-            {
-                var product = await _context.Products.FindAsync(item.ProductId);
-                if (product == null) throw new Exception($"المنتج رقم {item.ProductId} غير موجود.");
-                if (product.Stock < item.Quantity) throw new Exception($"الكمية المطلوبة من {product.Name} غير متوفرة.");
+    await _context.Orders.AddAsync(order);
+    await _context.SaveChangesAsync();
 
-                totalAmount += (product.Price * item.Quantity);
-                product.Stock -= item.Quantity;
-
-                orderItems.Add(new OrderItem
-                {
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    UnitPrice = product.Price,
-                    Product = product 
-                });
-            }
-
-            var order = new Order
-            {
-                UserId = userId,
-                TotalAmount = totalAmount,
-                Status = OrderStatus.Preparing,
-                OrderItems = orderItems,
-                ShippingAddress = dto.ShippingAddress, // 👈 أخذ العنوان من المستخدم
-                PhoneNumber = dto.PhoneNumber,
-            };
-
-            await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
-
-            return new OrderResponseDto
-            {
-                OrderId = order.Id,
-                OrderDate = order.OrderDate,
-                TotalAmount = order.TotalAmount,
-                ShippingAddress = order.ShippingAddress, // 👈 إرجاعها في الرد
-                PhoneNumber = order.PhoneNumber,
-                Status = order.Status.ToString(),
-                UserId = order.UserId,
-                Items = orderItems.Select(oi => new OrderItemResponseDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product?.Name ?? "N/A",      // إنجليزي
-                    ProductNameAR = oi.Product?.NameAR ?? "غير متوفر", // عربي
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList()
-            };
-        }
-
-        // ==========================================
+    // ==========================================
+    // 4. إرجاع النتيجة
+    // ==========================================
+    return new OrderResponseDto
+    {
+        OrderId = order.Id,
+        OrderDate = order.OrderDate,
+        TotalAmount = order.TotalAmount,
+        ShippingAddress = order.ShippingAddress, 
+        PhoneNumber = order.PhoneNumber,
+        Status = order.Status.ToString(),
+        UserId = order.UserId,
+        Items = orderItems.Select(oi => new OrderItemResponseDto
+        {
+            ProductId = oi.ProductId,
+            ProductName = oi.Product?.Name ?? "N/A",      
+            ProductNameAR = oi.Product?.NameAR ?? "غير متوفر", 
+            Quantity = oi.Quantity,
+            UnitPrice = oi.UnitPrice
+        }).ToList()
+    };
+}
         // جلب طلبات المستخدم الحالي
         // ==========================================
         public async Task<IEnumerable<OrderResponseDto>> GetUserOrdersAsync(string userId)
