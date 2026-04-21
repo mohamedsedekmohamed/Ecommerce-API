@@ -32,7 +32,7 @@ namespace EcommerceAPI.Services
 
     Name = p.Name,
     NameAR = p.NameAR,
-
+Currency = p.Currency.ToString(),
     Description = p.Description,
     DescriptionAR = p.DescriptionAR,
 
@@ -81,6 +81,7 @@ namespace EcommerceAPI.Services
     DescriptionAR = dto.DescriptionAR,
     Price = dto.Price,
     ImageUrl = dto.ImageUrl,
+    Currency = dto.Currency,
     Stock = dto.Stock,
     CategoryId = dto.CategoryId,
     CreatedByUserId = userId
@@ -112,7 +113,7 @@ namespace EcommerceAPI.Services
             product.CategoryId = dto.CategoryId;
             product.NameAR = dto.NameAR;
             product.DescriptionAR = dto.DescriptionAR;
-
+            product.Currency = dto.Currency;
 
             await _context.SaveChangesAsync();
             return await GetProductByIdAsync(product.Id, userId, true);

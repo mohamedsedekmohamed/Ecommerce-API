@@ -25,9 +25,12 @@ namespace EcommerceAPI.Services
                     Street = a.Street,
                     City = a.City,
                     State = a.State,
-                    ZipCode = a.ZipCode,
                     PhoneNumber = a.PhoneNumber,
-                    IsDefault = a.IsDefault
+                    IsDefault = a.IsDefault,
+                    Latitude = a.Latitude,
+                    Longitude = a.Longitude,
+
+
                 })
                 .OrderByDescending(a => a.IsDefault) // عرض العنوان الافتراضي أولاً
                 .ToListAsync();
@@ -54,9 +57,10 @@ namespace EcommerceAPI.Services
                 Street = model.Street,
                 City = model.City,
                 State = model.State,
-                ZipCode = model.ZipCode,
                 PhoneNumber = model.PhoneNumber,
-                IsDefault = shouldBeDefault
+                IsDefault = shouldBeDefault,
+                 Latitude = model.Latitude,
+                    Longitude = model.Longitude,
             };
 
             await _context.Addresses.AddAsync(newAddress);

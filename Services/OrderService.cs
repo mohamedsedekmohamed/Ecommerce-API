@@ -33,8 +33,9 @@ namespace EcommerceAPI.Services
         throw new Exception("العنوان المختار غير موجود أو لا يخص هذا المستخدم.");
 
     // تجميع العنوان في نص واحد لحفظه في الطلب
-    string fullShippingAddress = $"{userAddress.Street}, {userAddress.City}, {userAddress.State}, {userAddress.ZipCode}";
-
+    string fullShippingAddress = $"{userAddress.Street}, {userAddress.City}, {userAddress.State}";
+    string Latitude = userAddress.Latitude;
+    string Longitude = userAddress.Longitude;
     decimal totalAmount = 0;
     var orderItems = new List<OrderItem>();
 
@@ -68,7 +69,8 @@ namespace EcommerceAPI.Services
         TotalAmount = totalAmount,
         Status = OrderStatus.Preparing,
         OrderItems = orderItems,
-        
+        Latitude = Latitude,
+        Longitude = Longitude,
         // 👈 نضع العنوان المجمع هنا كـ Text
         ShippingAddress = fullShippingAddress, 
         
@@ -91,6 +93,8 @@ namespace EcommerceAPI.Services
         PhoneNumber = order.PhoneNumber,
         Status = order.Status.ToString(),
         UserId = order.UserId,
+        Latitude = order.Latitude,
+        Longitude = order.Longitude,
         Items = orderItems.Select(oi => new OrderItemResponseDto
         {
             ProductId = oi.ProductId,
@@ -115,7 +119,9 @@ namespace EcommerceAPI.Services
             return orders.Select(o => new OrderResponseDto
             {
                 OrderId = o.Id,
-                ShippingAddress = o.ShippingAddress, // 👈 جلب من الداتا بيز
+                ShippingAddress = o.ShippingAddress,
+Latitude = o.Latitude,
+Longitude = o.Longitude,
                 PhoneNumber = o.PhoneNumber,
                 OrderDate = o.OrderDate,
                 TotalAmount = o.TotalAmount,
@@ -139,6 +145,7 @@ namespace EcommerceAPI.Services
         public async Task<IEnumerable<OrderResponseDto>> GetAllOrdersAsync()
         {
             var orders = await _context.Orders
+                .Include(o => o.User)
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
                 .OrderByDescending(o => o.OrderDate)
@@ -147,12 +154,20 @@ namespace EcommerceAPI.Services
             return orders.Select(o => new OrderResponseDto
             {
                 OrderId = o.Id,
-                ShippingAddress = o.ShippingAddress, // 👈 جلب من الداتا بيز
+                ShippingAddress = o.ShippingAddress,
+                Latitude = o.Latitude,
+                Longitude = o.Longitude,
                 PhoneNumber = o.PhoneNumber,
                 OrderDate = o.OrderDate,
                 TotalAmount = o.TotalAmount,
                 Status = o.Status.ToString(),
                 UserId = o.UserId,
+                User = o.User != null ? new UserInfoDto 
+                    {
+            Id = o.User.Id,
+            FullName = o.User.UserName, 
+            Email = o.User.Email
+               } : null,
                 Items = o.OrderItems.Select(oi => new OrderItemResponseDto
                 {
                     ProductId = oi.ProductId,

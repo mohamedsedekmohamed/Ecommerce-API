@@ -107,32 +107,91 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
 
         // حذف حسابي
        // 1. حذف حسابي الشخصي (لأي مستخدم مسجل دخول)
-        [HttpDelete("delete-my-account")]
-        // مش محتاجين نحدد Role هنا لأن أي حد من حقه يحذف حسابه
-        public async Task<IActionResult> DeleteMyAccount()
+       // ==========================================
+        // 1. حذف حسابي - خاص بالمستخدم العادي
+        // ==========================================
+        [HttpDelete("delete-my-account-user")]
+        [Authorize(Roles = AppRoles.User)]
+        public async Task<IActionResult> DeleteMyAccountUser()
+        {
+            var lang = GetLang();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            // هنا ممكن تستدعي دالة من السيرفيس مخصصة لحذف المستخدم العادي
+            var result = await _authService.DeleteUserAsync(userId); 
+
+            if (!result) return BadRequest(ApiResponse.Error("خطأ أثناء الحذف", "Error", lang));
+            return Ok(ApiResponse.Success("تم حذف حسابك (كمستخدم) بنجاح", "User account deleted", lang));
+        }
+
+        // ==========================================
+        // 2. حذف حسابي - خاص بالأدمن
+        // ==========================================
+        [HttpDelete("delete-my-account-admin")]
+        [Authorize(Roles = AppRoles.Admin)]
+        public async Task<IActionResult> DeleteMyAccountAdmin()
+        {
+            var lang = GetLang();
+            var adminId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            // هنا ممكن تستدعي دالة مخصصة للأدمن (مثلاً بتنقل منتجاته قبل الحذف)
+            var result = await _authService.DeleteUserAsync(adminId); 
+
+            if (!result) return BadRequest(ApiResponse.Error("خطأ أثناء الحذف", "Error", lang));
+            return Ok(ApiResponse.Success("تم حذف حسابك (كأدمن) بنجاح", "Admin account deleted", lang));
+        }
+
+        // ==========================================
+        // 3. حذف حسابي - خاص بالسوبر أدمن
+        // ==========================================
+        [HttpDelete("delete-my-account-superadmin")]
+        [Authorize(Roles = AppRoles.SuperAdmin)]
+        public async Task<IActionResult> DeleteMyAccountSuperAdmin()
+        {
+            var lang = GetLang();
+            var superAdminId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            // ⚠️ تنبيه: يفضل تتأكد هنا إن ده مش آخر سوبر أدمن في الداتابيز عشان السيستم ميقفلش!
+            var result = await _authService.DeleteUserAsync(superAdminId); 
+
+            if (!result) return BadRequest(ApiResponse.Error("خطأ أثناء الحذف", "Error", lang));
+            return Ok(ApiResponse.Success("تم حذف حسابك (كسوبر أدمن) بنجاح", "SuperAdmin account deleted", lang));
+        }
+        // 3. حذف أدمن
+        [HttpDelete("delete-admin/{adminId}")]
+        [Authorize(Roles = AppRoles.SuperAdmin)]
+        public async Task<IActionResult> DeleteAdmin(string adminId)
         {
             var lang = GetLang();
 
-            // بنجيب الـ ID بتاع الشخص اللي عامل Request من التوكن بتاعه
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized(ApiResponse.Error("غير مصرح", "Unauthorized", lang));
+            // اختياري: منع السوبر أدمن من حذف نفسه بالخطأ من هذا الـ Endpoint
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId == adminId)
+                return BadRequest(ApiResponse.Error(
+                    "لا يمكنك حذف حسابك الشخصي من هنا", 
+                    "You cannot delete your own account from here", 
+                    lang));
 
-            var result = await _authService.DeleteUserAsync(userId);
+            var result = await _authService.DeleteUserAsync(adminId);
 
             if (!result)
-                return BadRequest(ApiResponse.Error(
-                    "حدث خطأ أثناء حذف الحساب",
-                    "Error deleting account",
+                return NotFound(ApiResponse.Error(
+                    "حساب الأدمن غير موجود أو حدث خطأ أثناء الحذف",
+                    "Admin not found or error occurred during deletion",
                     lang));
 
             return Ok(ApiResponse.Success(
-                "تم حذف حسابك بنجاح",
-                "Account deleted successfully",
+                "تم حذف حساب الأدمن بنجاح",
+                "Admin deleted successfully",
                 lang));
         }
-        
-
+ [HttpGet("all-users")]
+        [Authorize(Roles = AppRoles.SuperAdmin)]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _authService.GetUsersByRoleAsync(AppRoles.User);
+            return Ok(users);
+        }
         // تعديل حسابي
         [HttpPut("update-my-profile")]
         public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateMyProfileDto model)

@@ -49,6 +49,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
+builder.Services.AddScoped<IBannerService, BannerService>();
 // 4. تفعيل استخدام الـ Controllers
 builder.Services.AddControllers();
 

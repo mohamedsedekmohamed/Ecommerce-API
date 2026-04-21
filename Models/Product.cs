@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using EcommerceAPI.Enums;
 
 namespace EcommerceAPI.Models
 {
@@ -11,7 +12,7 @@ public string NameAR { get; set; } = string.Empty;
 public string DescriptionAR { get; set; } = string.Empty;
         [Column(TypeName = "decimal(18,2)")] 
         public decimal Price { get; set; }
-
+public Currency Currency { get; set; } = Currency.USD;
         public string ImageUrl { get; set; } = string.Empty;
         public int Stock { get; set; }
 

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using EcommerceAPI.Enums;
 
 namespace EcommerceAPI.DTOs.Products
 {
@@ -10,7 +11,7 @@ namespace EcommerceAPI.DTOs.Products
     public string NameAR { get; set; } = string.Empty;
 
     public string Description { get; set; } = string.Empty;
-
+public Currency Currency { get; set; }
     public string DescriptionAR { get; set; } = string.Empty;
 
     [Required, Range(0.1, 100000)]

@@ -29,7 +29,7 @@ return new AuthModel { ErrorCode = "EmailExists" };
 
             var user = new ApplicationUser
             {
-                UserName = model.Email,
+                UserName = model.FullName,
                 Email = model.Email,
                 FullName = model.FullName,
                 PhoneNumber = model.PhoneNumber,
@@ -40,8 +40,8 @@ return new AuthModel { ErrorCode = "EmailExists" };
 
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return new AuthModel { Message = errors };
+              var errorCode = result.Errors.First().Code;
+    return new AuthModel { ErrorCode = errorCode };
             }
 
             await _userManager.AddToRoleAsync(user, AppRoles.User);
@@ -105,7 +105,7 @@ return new AuthModel { ErrorCode = "EmailExists" };
 
     var user = new ApplicationUser
     {
-        UserName = model.Email,
+UserName = model.Name,
         Email = model.Email,
         FullName = model.Name
     };
@@ -142,7 +142,7 @@ return new AuthModel
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) return false;
 
-            user.FullName = model.Name;
+user.UserName = model.Name;
             user.Email = model.Email;
             user.UserName = model.Email; 
 
@@ -193,7 +193,7 @@ return new AuthModel
             if (user == null) return false;
 
             // 1. تحديث البيانات الأساسية
-            user.FullName = model.Name;
+user.UserName = model.Name;
             user.Email = model.Email;
             user.UserName = model.Email; 
 

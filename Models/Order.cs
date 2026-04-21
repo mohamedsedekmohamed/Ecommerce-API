@@ -13,6 +13,10 @@ namespace EcommerceAPI.Models
 
         public OrderStatus Status { get; set; } = OrderStatus.Preparing;
     public string ShippingAddress { get; set; } = string.Empty;
+
+        public string Latitude { get; set; }    = string.Empty; 
+    public string Longitude { get; set; }  = string.Empty;
+
         public string PhoneNumber { get; set; } = string.Empty;
         // علاقة: الطلب ينتمي لمستخدم واحد
         public string UserId { get; set; } = string.Empty;

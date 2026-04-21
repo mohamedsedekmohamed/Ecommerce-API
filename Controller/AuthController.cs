@@ -76,8 +76,8 @@ private async Task<IActionResult> ProcessLoginAsync(LoginDto model, string role)
         }
     ));
 }
-        // تسجيل مستخدم جديد
-      [HttpPost("register")]
+
+[HttpPost("register")]
 public async Task<IActionResult> Register([FromBody] RegisterDto model)
 {
     var lang = GetLang();
@@ -88,28 +88,22 @@ public async Task<IActionResult> Register([FromBody] RegisterDto model)
     var result = await _authService.RegisterAsync(model);
 
     if (!result.IsAuthenticated)
-{
-    var (ar, en) = result.ErrorCode switch
     {
-        "EmailExists" => ("البريد الإلكتروني مستخدم بالفعل", "Email already exists"),
-        "InvalidCredentials" => ("الإيميل أو كلمة المرور غير صحيحة", "Invalid email or password"),
-        "UnauthorizedRole" => ("غير مصرح لك بالدخول بهذا الدور", "Unauthorized role"),
-        
-        // Identity Errors 👇
-        "PasswordTooShort" => ("كلمة المرور قصيرة جداً", "Password is too short"),
-        "PasswordRequiresDigit" => ("يجب أن تحتوي كلمة المرور على رقم", "Password must contain a digit"),
-        "PasswordRequiresUpper" => ("يجب أن تحتوي على حرف كبير", "Password must contain uppercase letter"),
-        "PasswordRequiresNonAlphanumeric" => ("يجب أن تحتوي على رمز", "Password must contain special character"),
+        var (ar, en) = result.ErrorCode switch
+        {
+            "EmailExists" => ("البريد الإلكتروني مستخدم بالفعل", "Email already exists"),
+            "PasswordTooShort" => ("كلمة المرور قصيرة جداً", "Password is too short"),
+            "PasswordRequiresDigit" => ("يجب أن تحتوي كلمة المرور على رقم", "Password must contain a digit"),
+            "PasswordRequiresUpper" => ("يجب أن تحتوي على حرف كبير", "Password must contain uppercase letter"),
+            "PasswordRequiresNonAlphanumeric" => ("يجب أن تحتوي على رمز", "Password must contain special character"),
+            _ => ("حدث خطأ", "Something went wrong")
+        };
 
-        _ => ("حدث خطأ", "Something went wrong")
-    };
-
-    return BadRequest(ApiResponse.Error(ar, en, lang));
-}
+        return BadRequest(ApiResponse.Error(ar, en, lang));
+    }
 
     return Ok(ApiResponse.Success("تم إنشاء الحساب بنجاح", "Account created successfully", lang));
 }
-
 
     }
 }
