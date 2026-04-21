@@ -9,7 +9,7 @@ namespace EcommerceAPI.Models
 
     public string Description { get; set; } = string.Empty;
     public string DescriptionAR { get; set; } = string.Empty;
-
+        public string Icon { get; set; } = string.Empty;
         public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

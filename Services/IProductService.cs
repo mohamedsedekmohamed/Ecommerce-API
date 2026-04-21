@@ -9,5 +9,6 @@ namespace EcommerceAPI.Services
         Task<ProductDto?> CreateProductAsync(CreateProductDto dto, string userId);
         Task<ProductDto?> UpdateProductAsync(int id, CreateProductDto dto, string userId, bool isSuperAdmin);
         Task<bool> DeleteProductAsync(int id, string userId, bool isSuperAdmin);
+        Task<IEnumerable<ProductDto>> SearchProductsAsync(string name, string userId, bool isSuperAdmin, bool isActiveOnly);
     }
 }

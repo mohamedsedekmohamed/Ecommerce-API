@@ -201,5 +201,64 @@ namespace EcommerceAPI.Controllers
                 "Product deleted successfully",
                 lang));
         }
+
+
+        [HttpGet("user/search")]
+[AllowAnonymous]
+public async Task<IActionResult> SearchForUser([FromQuery] string name)
+{
+    var lang = GetLang();
+
+    var products = await _productService.SearchProductsAsync(
+        name,
+        string.Empty,
+        false,
+        true // 👈 active فقط
+    );
+
+    return Ok(ApiResponse.Success(
+        "تم البحث بنجاح",
+        "Search completed",
+        lang,
+        products));
+}
+[HttpGet("admin/search")]
+[Authorize(Roles = AppRoles.Admin)]
+public async Task<IActionResult> SearchForAdmin([FromQuery] string name)
+{
+    var lang = GetLang();
+
+    var products = await _productService.SearchProductsAsync(
+        name,
+        GetUserId(),
+        false,
+        false
+    );
+
+    return Ok(ApiResponse.Success(
+        "تم البحث بنجاح",
+        "Search completed",
+        lang,
+        products));
+}
+[HttpGet("superadmin/search")]
+[Authorize(Roles = AppRoles.SuperAdmin)]
+public async Task<IActionResult> SearchForSuperAdmin([FromQuery] string name)
+{
+    var lang = GetLang();
+
+    var products = await _productService.SearchProductsAsync(
+        name,
+        GetUserId(),
+        true,
+        false
+    );
+
+    return Ok(ApiResponse.Success(
+        "تم البحث بنجاح",
+        "Search completed",
+        lang,
+        products));
+}
     }
 }

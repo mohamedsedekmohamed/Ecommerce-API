@@ -5,6 +5,7 @@ namespace EcommerceAPI.Models
 {
     public class Product
     {
+        public bool IsActive { get; set; } = true;
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 public string NameAR { get; set; } = string.Empty;

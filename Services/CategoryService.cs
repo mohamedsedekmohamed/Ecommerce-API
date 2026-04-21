@@ -24,7 +24,9 @@ namespace EcommerceAPI.Services
     Name = c.Name,
     NameAR = c.NameAR,
     Description = c.Description,
-    DescriptionAR = c.DescriptionAR
+    DescriptionAR = c.DescriptionAR,
+    Icon = c.Icon
+
 });
         }
 
@@ -39,7 +41,8 @@ namespace EcommerceAPI.Services
     Name = category.Name,
     NameAR = category.NameAR,
     Description = category.Description,
-    DescriptionAR = category.DescriptionAR
+    DescriptionAR = category.DescriptionAR,
+    Icon = category.Icon
 };
         }
 
@@ -50,7 +53,8 @@ namespace EcommerceAPI.Services
   Name = dto.Name,
         NameAR = dto.NameAR,
         Description = dto.Description,
-        DescriptionAR = dto.DescriptionAR
+        DescriptionAR = dto.DescriptionAR,
+        Icon = dto.Icon
             };
 
             await _context.Categories.AddAsync(category);
@@ -61,7 +65,8 @@ namespace EcommerceAPI.Services
                  Name = dto.Name,
     NameAR = dto.NameAR,
     Description = dto.Description,
-    DescriptionAR = dto.DescriptionAR
+    DescriptionAR = dto.DescriptionAR,
+                 Icon = dto.Icon,
             };
         }
 
@@ -83,7 +88,8 @@ namespace EcommerceAPI.Services
                 Name = category.Name,
                 NameAR = category.NameAR,
                 Description = category.Description,
-                DescriptionAR = category.DescriptionAR
+                DescriptionAR = category.DescriptionAR,
+                Icon = category.Icon
             };
         }
 
@@ -96,17 +102,17 @@ namespace EcommerceAPI.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<IEnumerable<CategorySelectDto>> GetCategoriesForSelectAsync()
+      public async Task<IEnumerable<CategorySelectDto>> GetCategoriesForSelectAsync()
+{
+    return await _context.Categories
+        .Select(c => new CategorySelectDto
         {
-            return await _context.Categories
-                .Select(c => new CategorySelectDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    NameAR = c.NameAR
-
-                })
-                .ToListAsync();
-        }
+            Id = c.Id,
+            Name = c.Name,
+            NameAR = c.NameAR,
+            ProductsCount = _context.Products.Count(p => p.CategoryId == c.Id) // 👈 هنا
+        })
+        .ToListAsync();
+}
     }
 }

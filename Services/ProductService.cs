@@ -26,15 +26,14 @@ namespace EcommerceAPI.Services
 
             var products = await query.ToListAsync();
             
-        return products.Select(p => new ProductDto
+      return products.Select(p => new ProductDto
 {
     Id = p.Id,
-
     Name = p.Name,
     NameAR = p.NameAR,
-Currency = p.Currency.ToString(),
     Description = p.Description,
     DescriptionAR = p.DescriptionAR,
+    Currency = p.Currency.ToString(),
 
     Price = p.Price,
     ImageUrl = p.ImageUrl,
@@ -55,17 +54,26 @@ Currency = p.Currency.ToString(),
             // 👈 حماية: لو مش سوبر أدمن، والمنتج ده مش بتاعه، نرجع null كأنه مش موجود
             if (!isSuperAdmin && p.CreatedByUserId != userId) return null;
 
-            return new ProductDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                ImageUrl = p.ImageUrl,
-                Stock = p.Stock,
-                CategoryId = p.CategoryId,
-                CategoryName = p.Category?.Name ?? "بدون تصنيف"
-            };
+          return new ProductDto
+{
+    Id = p.Id,
+
+    Name = p.Name,
+    NameAR = p.NameAR,
+
+    Description = p.Description,
+    DescriptionAR = p.DescriptionAR,
+
+    Price = p.Price,
+    ImageUrl = p.ImageUrl,
+    Stock = p.Stock,
+
+    Currency = p.Currency.ToString(),
+
+    CategoryId = p.CategoryId,
+    CategoryName = p.Category?.Name ?? "بدون تصنيف",
+    CategoryNameAR = p.Category?.NameAR ?? "بدون تصنيف"
+};
         }
 
         public async Task<ProductDto?> CreateProductAsync(CreateProductDto dto, string userId)
@@ -131,5 +139,51 @@ Currency = p.Currency.ToString(),
             await _context.SaveChangesAsync();
             return true;
         }
+
+
+        public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string name, string userId, bool isSuperAdmin, bool isActiveOnly)
+{
+var query = _context.Products
+    .Include(p => p.Category)
+    .AsQueryable();
+    // فلترة بالاسم
+    if (!string.IsNullOrEmpty(name))
+    {
+      query = query.Where(p =>
+    EF.Functions.Like(p.Name, $"%{name}%") ||
+    EF.Functions.Like(p.NameAR, $"%{name}%"));
+    }
+
+  
+   
+
+    // Admin → يشوف منتجاته بس
+    if (!isSuperAdmin && !string.IsNullOrEmpty(userId))
+    {
+        query = query.Where(p => p.CreatedByUserId == userId);
+    }
+return await query
+.Select(p => new ProductDto
+{
+    Id = p.Id,
+
+    Name = p.Name,
+    NameAR = p.NameAR,
+
+    Description = p.Description,
+    DescriptionAR = p.DescriptionAR,
+
+    Price = p.Price,
+    Currency = p.Currency.ToString(),
+
+    ImageUrl = p.ImageUrl,
+    Stock = p.Stock,
+    CategoryId = p.CategoryId,
+
+    CategoryName = p.Category != null ? p.Category.Name : "بدون تصنيف",
+    CategoryNameAR = p.Category != null ? p.Category.NameAR : "بدون تصنيف"
+})
+.ToListAsync();
+}
     }
 }
