@@ -6,6 +6,8 @@ namespace EcommerceAPI.DTOs.Categories
 
         public string Name { get; set; } = string.Empty;
         public string NameAR { get; set; } = string.Empty;
+                public string Icon { get; set; } = string.Empty;
+
             public int ProductsCount { get; set; } 
     }
 }

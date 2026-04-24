@@ -110,6 +110,7 @@ namespace EcommerceAPI.Services
             Id = c.Id,
             Name = c.Name,
             NameAR = c.NameAR,
+            Icon = c.Icon,
             ProductsCount = _context.Products.Count(p => p.CategoryId == c.Id) // 👈 هنا
         })
         .ToListAsync();
