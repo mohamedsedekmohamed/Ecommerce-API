@@ -4,6 +4,8 @@ using EcommerceAPI.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.SignalR; // تم الإضافة
+using EcommerceAPI.Hubs; // تم الإضافة
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -17,10 +19,12 @@ namespace EcommerceAPI.Controllers
     public class ChatController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHubContext<ChatHub> _hubContext; // حقن الـ Hub Context
 
-        public ChatController(ApplicationDbContext context)
+        public ChatController(ApplicationDbContext context, IHubContext<ChatHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         // =================================================================================
@@ -114,6 +118,10 @@ namespace EcommerceAPI.Controllers
             await _context.ChatMessages.AddAsync(newMessage);
             await _context.SaveChangesAsync();
 
+            // التحديث اللحظي: إرسال الرسالة للمستخدم عبر SignalR
+            await _hubContext.Clients.User(dto.ReceiverId)
+                .SendAsync("ReceiveMessage", myId, dto.Message, newMessage.CreatedAt);
+
             return Ok(ApiResponse.Success("تم إرسال الرسالة للمستخدم", "Sent to User", "ar"));
         }
 
@@ -184,6 +192,10 @@ namespace EcommerceAPI.Controllers
 
             await _context.ChatMessages.AddAsync(newMessage);
             await _context.SaveChangesAsync();
+
+            // التحديث اللحظي: إرسال الرسالة للسوبر أدمن عبر SignalR
+            await _hubContext.Clients.User(superAdminId)
+                .SendAsync("ReceiveMessage", myId, dto.Message, newMessage.CreatedAt);
 
             return Ok(ApiResponse.Success("تم إرسال الرسالة للإدارة", "Sent to SuperAdmin", "ar"));
         }
