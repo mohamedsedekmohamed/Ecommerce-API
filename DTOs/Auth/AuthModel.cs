@@ -7,7 +7,7 @@ namespace EcommerceAPI.DTOs.Auth
            public string? ErrorCode { get; set; } // 👈 جديد
 public string? MessageAr { get; set; } // (اختياري للـ success)
 public string? MessageEn { get; set; }
-
+public string Name { get; set; } = string.Empty;
         public string Token { get; set; } = string.Empty;
         public DateTime ExpiresOn { get; set; }
 

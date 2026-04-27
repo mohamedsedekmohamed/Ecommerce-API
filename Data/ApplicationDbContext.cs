@@ -36,6 +36,8 @@ protected override void OnModelCreating(ModelBuilder builder)
         public DbSet<ChatMessage> ChatMessages { get; set; } 
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Banner> Banners { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
         
     }
 }

@@ -21,25 +21,44 @@ namespace EcommerceAPI.Data
             if (!await roleManager.RoleExistsAsync(AppRoles.User))
                 await roleManager.CreateAsync(new IdentityRole(AppRoles.User));
 
-            // 2. إنشاء حساب المدير العام الافتراضي
-            var superAdminEmail = "admin@ecommerce.com";
-            var existingAdmin = await userManager.FindByEmailAsync(superAdminEmail);
-
-            if (existingAdmin == null)
+            // 2. تجهيز قائمة الحسابات الثلاثة الافتراضية
+            var defaultUsers = new List<(ApplicationUser User, string Password, string Role)>
             {
-                var newAdmin = new ApplicationUser
-                {
-                    UserName = superAdminEmail,
-                    Email = superAdminEmail,
-                    FullName = "Super Admin"
-                };
+                // حساب السوبر أدمن
+                (new ApplicationUser { 
+                    UserName = "mohamedsuperadmin", 
+                    Email = "superadmin@ecommerce.com", 
+                    FullName = "Super Admin" 
+                }, "Admin@123", AppRoles.SuperAdmin),
 
-                // الباسورد الافتراضي للمدير (يمكنك تغييره لاحقاً)
-                var result = await userManager.CreateAsync(newAdmin, "Admin@123");
-                if (result.Succeeded)
+                // حساب الأدمن
+                (new ApplicationUser { 
+                    UserName = "mohamedadmin", 
+                    Email = "admin@ecommerce.com", 
+                    FullName = "System Admin" 
+                }, "Admin@123", AppRoles.Admin),
+
+                // حساب المستخدم العادي
+                (new ApplicationUser { 
+                    UserName = "mohameduser", 
+                    Email = "user@ecommerce.com", 
+                    FullName = "Test User" 
+                }, "User@123", AppRoles.User)
+            };
+
+            // 3. المرور على القائمة وإنشاء الحسابات إذا لم تكن موجودة
+            foreach (var item in defaultUsers)
+            {
+                var existingUser = await userManager.FindByEmailAsync(item.User.Email);
+
+                if (existingUser == null)
                 {
-                    // إعطاء هذا الحساب صلاحية SuperAdmin
-                    await userManager.AddToRoleAsync(newAdmin, AppRoles.SuperAdmin);
+                    var result = await userManager.CreateAsync(item.User, item.Password);
+                    if (result.Succeeded)
+                    {
+                        // إعطاء الصلاحية المناسبة لكل حساب
+                        await userManager.AddToRoleAsync(item.User, item.Role);
+                    }
                 }
             }
         }

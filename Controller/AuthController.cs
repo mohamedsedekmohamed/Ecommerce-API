@@ -69,6 +69,7 @@ private async Task<IActionResult> ProcessLoginAsync(LoginDto model, string role)
             userDetails = new 
             {
                 id = result.Id,
+                name = result.Name,
                 email = result.Email,
                 username = result.Username,
                 roles = result.Roles

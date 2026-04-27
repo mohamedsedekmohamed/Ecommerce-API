@@ -50,6 +50,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 // 4. تفعيل استخدام الـ Controllers
 builder.Services.AddControllers();
 
@@ -124,21 +125,25 @@ using (var scope = app.Services.CreateScope())
     var superAdminEmail = "superadmin@ecommerce.com";
     var user = await userManager.FindByEmailAsync(superAdminEmail);
 
-    if (user == null)
+   // ----------------------------------------------------
+// 🔥 كود تشغيل الـ Seeder عند بدء التطبيق
+// ----------------------------------------------------
+using (var seederScope = app.Services.CreateScope()) // ✅ غيرنا الاسم هنا لـ seederScope
+{
+    var services = seederScope.ServiceProvider; // ✅ وغيرناه هنا كمان
+    try
     {
-        var superAdmin = new ApplicationUser
-        {
-            UserName = "superadmin",
-            Email = superAdminEmail,
-            EmailConfirmed = true
-        };
-
-        var result = await userManager.CreateAsync(superAdmin, "Super@Admin2026!"); 
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(superAdmin, AppRoles.SuperAdmin);
-        }
+        // استدعاء الدالة اللي عملناها في DbSeeder
+        await DbSeeder.SeedRolesAndSuperAdminAsync(services);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "حدث خطأ أثناء إدخال البيانات الافتراضية.");
     }
 }
+// ----------------------------------------------------
+}
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHub<ChatHub>("/chatHub");
 app.Run();

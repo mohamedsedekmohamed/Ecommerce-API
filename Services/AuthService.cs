@@ -92,8 +92,8 @@ return new AuthModel { ErrorCode = "EmailExists" };
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 ExpiresOn = token.ValidTo,
                 Id = user.Id,        
-                 Email = user.Email,          
-                Username = user.UserName,     
+              Name = user.FullName,  // 🔥 السطر الجديد اللي هيجيب الاسم
+    Email = user.Email,    
                 Roles = userRoles.ToList()
             };
         }
@@ -137,18 +137,30 @@ return new AuthModel
     };
 }
         // 4. تعديل بيانات الحساب (الاسم والإيميل)
-        public async Task<bool> UpdateUserAsync(string userId, UpdateUserDto model)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return false;
+       public async Task<bool> UpdateUserAsync(string userId, UpdateUserDto model)
+{
+    var user = await _userManager.FindByIdAsync(userId);
+    if (user == null) return false;
 
-user.UserName = model.Name;
-            user.Email = model.Email;
-            user.UserName = model.Email; 
+    // 1. تحديث الاسم (لأنه حقل مخصص عملناه بإيدينا)
+    user.FullName = model.Name;
+    var updateResult = await _userManager.UpdateAsync(user);
+    if (!updateResult.Succeeded) return false;
 
-            var result = await _userManager.UpdateAsync(user);
-            return result.Succeeded;
-        }
+    // 2. تحديث الإيميل واليوزر نيم (باستخدام دوال Identity الرسمية)
+    if (user.Email != model.Email)
+    {
+        // تحديث الإيميل
+        var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+        if (!setEmailResult.Succeeded) return false;
+
+        // تحديث اليوزر نيم (لأننا مخلينه هو هو الإيميل)
+        var setUserNameResult = await _userManager.SetUserNameAsync(user, model.Email);
+        if (!setUserNameResult.Succeeded) return false;
+    }
+
+    return true;
+}
 
         // 5. تغيير كلمة المرور
         public async Task<bool> ChangePasswordAsync(string userId, ChangePasswordDto model)
@@ -195,7 +207,7 @@ user.UserName = model.Name;
             // 1. تحديث البيانات الأساسية
 user.UserName = model.Name;
             user.Email = model.Email;
-            user.UserName = model.Email; 
+            // user.UserName = model.Email; 
 
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded) return false;

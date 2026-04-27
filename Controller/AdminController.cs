@@ -44,6 +44,7 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
     if (userId == null)
         return Unauthorized(ApiResponse.Error("غير مصرح", "Unauthorized", lang));
 
+    // 1. تحديث الاسم والإيميل
     var updateDto = new UpdateUserDto
     {
         Name = model.Name,
@@ -58,11 +59,37 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
             "Failed to update profile",
             lang));
 
+    // 2. 🔥 الجزء اللي كان مفقود: تحديث الباسورد
+    if (!string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.NewPassword))
+    {
+        var passResult = await _authService.ChangePasswordAsync(userId,
+            new ChangePasswordDto
+            {
+                CurrentPassword = model.CurrentPassword,
+                NewPassword = model.NewPassword
+            });
+
+        // لو الباسورد القديم غلط أو الجديد ضعيف
+        if (!passResult) 
+            return BadRequest(ApiResponse.Error(
+                "تم تحديث الاسم والإيميل، لكن كلمة المرور القديمة غير صحيحة أو الجديدة ضعيفة",
+                "Profile updated but password change failed",
+                lang));
+    }
+
     return Ok(ApiResponse.Success(
-        "تم تحديث بيانات السوبر أدمن",
-        "SuperAdmin profile updated",
+        "تم تحديث بيانات السوبر أدمن وتغيير كلمة المرور بنجاح",
+        "SuperAdmin profile and password updated",
         lang));
 }
+
+
+
+
+
+
+
+
         // 1. إضافة أدمن
         [HttpPost("add-admin")]
         [Authorize(Roles = AppRoles.SuperAdmin)]
