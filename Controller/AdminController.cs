@@ -48,7 +48,8 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
     var updateDto = new UpdateUserDto
     {
         Name = model.Name,
-        Email = model.Email
+        Email = model.Email,
+        PhoneNumber = model.PhoneNumber
     };
 
     var result = await _authService.UpdateUserAsync(userId, updateDto);
@@ -235,7 +236,8 @@ public async Task<IActionResult> UpdateSuperAdminProfile([FromBody] UpdateMyProf
             var updateDto = new UpdateUserDto
             {
                 Name = model.Name,
-                Email = model.Email
+                Email = model.Email,
+PhoneNumber = model.PhoneNumber
             };
 
             var result = await _authService.UpdateUserAsync(userId, updateDto);

@@ -22,5 +22,7 @@ public Currency Currency { get; set; } = Currency.USD;
 
         // 👈 الحقل الجديد لمعرفة من قام بإضافة المنتج
         public string? CreatedByUserId { get; set; } 
+        [ForeignKey("CreatedByUserId")]
+    public ApplicationUser CreatedByUser { get; set; }
     }
 }

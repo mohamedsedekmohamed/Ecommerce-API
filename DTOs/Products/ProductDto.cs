@@ -18,5 +18,10 @@ public string Currency { get; set; } = string.Empty;
 
     public string CategoryName { get; set; } = string.Empty;
     public string CategoryNameAR { get; set; } = string.Empty;
+    public string CreatedByUserName { get; set; } // اسم المنشئ
+    public string CreatedByUserId { get; set; }
+    public string? CreatedByUserRole { get; set; }
+    public string CreatedByUserPhone { get; set; }
+    public string CreatedByUserEmail { get; set; }
 }
 }
