@@ -8,5 +8,8 @@ namespace EcommerceAPI.DTOs.Orders
 
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
+        public string? VendorId { get; set; }
+    public string? VendorName { get; set; }
+    public string? VendorPhone { get; set; }
     }
 }

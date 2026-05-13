@@ -139,7 +139,10 @@ foreach (var adminId in distinctAdminIds)
                     ProductName = oi.Product?.Name ?? "N/A",      
                     ProductNameAR = oi.Product?.NameAR ?? "غير متوفر", 
                     Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
+                    UnitPrice = oi.UnitPrice,
+                    VendorId = oi.Product?.CreatedByUserId,
+        VendorName = oi.Product?.CreatedByUser?.FullName ?? oi.Product?.CreatedByUser?.UserName ?? "غير معروف",
+        VendorPhone = oi.Product?.CreatedByUser?.WhatsAppNumber ?? oi.Product?.CreatedByUser?.PhoneNumber ?? "لا يوجد رقم"
                 }).ToList()
             };
         }
@@ -181,43 +184,35 @@ foreach (var adminId in distinctAdminIds)
         // ==========================================
         // جلب جميع الطلبات (للسوبر أدمن)
         // ==========================================
-        public async Task<IEnumerable<OrderResponseDto>> GetAllOrdersAsync()
+    public async Task<IEnumerable<OrderResponseDto>> GetAllOrdersAsync()
+{
+    var orders = await _context.Orders
+        .Include(o => o.User)
+        .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+                .ThenInclude(p => p.CreatedByUser) // 🔥 أهم سطر: جلب بيانات صاحب المنتج
+        .OrderByDescending(o => o.OrderDate)
+        .ToListAsync();
+
+    return orders.Select(o => new OrderResponseDto
+    {
+        OrderId = o.Id,
+        // ... (باقي الحقول كما هي) ...
+        Items = o.OrderItems.Select(oi => new OrderItemResponseDto
         {
-            var orders = await _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
+            ProductId = oi.ProductId,
+            ProductName = oi.Product?.Name ?? "N/A",
+            ProductNameAR = oi.Product?.NameAR ?? "غير متوفر",
+            Quantity = oi.Quantity,
+            UnitPrice = oi.UnitPrice,
 
-            return orders.Select(o => new OrderResponseDto
-            {
-                OrderId = o.Id,
-                ShippingAddress = o.ShippingAddress,
-                Latitude = o.Latitude,
-                Longitude = o.Longitude,
-                PhoneNumber = o.PhoneNumber,
-                OrderDate = o.OrderDate,
-                TotalAmount = o.TotalAmount,
-                Status = o.Status.ToString(),
-                UserId = o.UserId,
-                User = o.User != null ? new UserInfoDto 
-                {
-                    Id = o.User.Id,
-                    FullName = o.User.FullName ?? o.User.UserName, 
-                    Email = o.User.Email
-                } : null,
-                Items = o.OrderItems.Select(oi => new OrderItemResponseDto
-                {
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product?.Name ?? "N/A",
-                    ProductNameAR = oi.Product?.NameAR ?? "غير متوفر",
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
-                }).ToList()
-            });
-        }
-
+            // 👇 ملء بيانات صاحب المنتج هنا
+            VendorId = oi.Product?.CreatedByUserId,
+            VendorName = oi.Product?.CreatedByUser?.FullName ?? oi.Product?.CreatedByUser?.UserName ?? "غير معروف",
+            VendorPhone = oi.Product?.CreatedByUser?.WhatsAppNumber ?? oi.Product?.CreatedByUser?.PhoneNumber ?? "لا يوجد رقم"
+        }).ToList()
+    });
+}
         // ==========================================
         // تحديث حالة الطلب
         // ==========================================
